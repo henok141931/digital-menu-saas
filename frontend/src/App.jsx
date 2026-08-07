@@ -7,7 +7,7 @@ import SuperAdminDashboard from './SuperAdminDashboard';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/roha-cafe" />} />
+      <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/:slug" element={<CustomerMenu />} />
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={<AdminPanel />} />
