@@ -13,7 +13,8 @@ function SuperAdminDashboard() {
   const [newRestName, setNewRestName] = useState('');
   const [newRestSlug, setNewRestSlug] = useState('');
   const [newRestDesc, setNewRestDesc] = useState('');
-  const [password, setPassword] = useState('');
+  const [adminUsername, setAdminUsername] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [toast, setToast] = useState({ message: '', type: 'success' });
@@ -69,14 +70,36 @@ function SuperAdminDashboard() {
       });
 
       if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.message || 'Failed to create restaurant');
+        const errData = await res.json();
+        throw new Error(errData.message || 'Failed to create restaurant');
+      }
+      
+      const d = await res.json();
+
+      // 2. Create the Admin user for this restaurant
+      const userRes = await fetch(`${BASE_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          username: adminUsername,
+          password: adminPassword,
+          role: 'ADMIN',
+          restaurantId: d._id
+        })
+      });
+
+      if (!userRes.ok) {
+        throw new Error('Restaurant created, but failed to create admin user');
       }
 
       setNewRestName('');
       setNewRestSlug('');
       setNewRestDesc('');
-      setPassword('');
+      setAdminUsername('');
+      setAdminPassword('');
       showToast('Restaurant created successfully!');
       await fetchRestaurants();
     } catch (err) {
@@ -142,6 +165,26 @@ function SuperAdminDashboard() {
               onChange={(e) => setNewRestDesc(e.target.value)}
               className="admin-input"
             />
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <input 
+                type="text" 
+                placeholder="Admin Username" 
+                value={adminUsername}
+                onChange={(e) => setAdminUsername(e.target.value)}
+                required
+                className="admin-input"
+                style={{ flex: 1 }}
+              />
+              <input 
+                type="password" 
+                placeholder="Admin Password" 
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                required
+                className="admin-input"
+                style={{ flex: 1 }}
+              />
+            </div>
             <button type="submit" className="add-btn primary" disabled={isSubmitting} style={{ alignSelf: 'flex-start' }}>
               {isSubmitting ? 'Creating...' : '+ Create Restaurant'}
             </button>
