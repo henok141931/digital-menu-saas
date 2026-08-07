@@ -107,7 +107,7 @@ function AdminPanel() {
     setError(null);
 
     try {
-      const res = await fetch('${BASE_URL}/api/menu/categories', {
+      const res = await fetch(`${BASE_URL}/api/menu/categories`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ function AdminPanel() {
     setError(null);
 
     try {
-      const res = await fetch('${BASE_URL}/api/menu/items', {
+      const res = await fetch(`${BASE_URL}/api/menu/items`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

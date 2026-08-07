@@ -34,7 +34,7 @@ function SuperAdminDashboard() {
   const fetchRestaurants = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('${BASE_URL}/api/restaurants', {
+      const res = await fetch(`${BASE_URL}/api/restaurants`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch restaurants');
@@ -54,7 +54,7 @@ function SuperAdminDashboard() {
     setError(null);
 
     try {
-      const res = await fetch('${BASE_URL}/api/restaurants', {
+      const res = await fetch(`${BASE_URL}/api/restaurants`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
