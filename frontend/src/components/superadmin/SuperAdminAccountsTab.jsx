@@ -153,7 +153,7 @@ export default function SuperAdminAccountsTab({ restaurants }) {
       )}
 
       {isModalOpen && (
-        <div className="modal-backdrop" onClick={closeModal} style={{ zIndex: 1000 }}>
+        <div className="modal-overlay" onClick={closeModal} style={{ zIndex: 1000 }}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', width: '90%' }}>
             <h2>{editingUser ? 'Edit Account' : 'Create Account'}</h2>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
