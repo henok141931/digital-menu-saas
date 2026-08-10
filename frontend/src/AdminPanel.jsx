@@ -509,7 +509,7 @@ function AdminPanel() {
             
             <div style={{ background: '#fff', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
               <QRCodeSVG 
-                value={`http://localhost:5173/${restaurantData.slug}`} 
+                value={`${window.location.origin}/${restaurantData.slug}`} 
                 size={120} 
                 level="M"
                 fgColor={brandColor}
