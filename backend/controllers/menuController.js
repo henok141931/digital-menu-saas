@@ -183,10 +183,10 @@ export const bulkUploadMenu = async (req, res) => {
     const categoryCache = {};
 
     for (const row of items) {
-      if (!row.Category || !row.ItemName) continue; // Skip invalid rows
+      if (!row.category || !row.itemname) continue; // Skip invalid rows
 
       let categoryId;
-      const categoryName = row.Category.trim();
+      const categoryName = row.category.trim();
 
       // Check if we already created it in this loop
       if (categoryCache[categoryName]) {
@@ -209,21 +209,21 @@ export const bulkUploadMenu = async (req, res) => {
       }
 
       // Parse price, default to 0 if invalid
-      let parsedPrice = parseFloat(row.Price);
+      let parsedPrice = parseFloat(row.price);
       if (isNaN(parsedPrice)) parsedPrice = 0;
 
       // Parse dietary tags
       let parsedTags = [];
-      if (row.DietaryTags) {
-        parsedTags = row.DietaryTags.split(',').map(tag => tag.trim()).filter(t => t);
+      if (row.dietarytags) {
+        parsedTags = row.dietarytags.split(',').map(tag => tag.trim()).filter(t => t);
       }
 
       // Create item
       await MenuItem.create({
         restaurantId,
         categoryId,
-        name: row.ItemName.trim(),
-        description: row.Description ? row.Description.trim() : '',
+        name: row.itemname.trim(),
+        description: row.description ? row.description.trim() : '',
         price: parsedPrice,
         dietaryTags: parsedTags,
         sortOrder: itemsCreated,

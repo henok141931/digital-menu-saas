@@ -38,7 +38,6 @@ const menuItemSchema = new mongoose.Schema(
     },
     dietaryTags: {
       type: [String],
-      enum: ['Fasting', 'Non-Fasting'],
       default: [],
     },
     sortOrder: {

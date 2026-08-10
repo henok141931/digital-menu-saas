@@ -7,6 +7,7 @@ function EditItemModal({ item, categories, onClose, onSave }) {
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [dietaryTags, setDietaryTags] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -16,6 +17,7 @@ function EditItemModal({ item, categories, onClose, onSave }) {
       setPrice(item.price || '');
       setImageUrl(item.imageUrl || '');
       setCategoryId(item.categoryId || '');
+      setDietaryTags((item.dietaryTags || []).join(', '));
     }
   }, [item]);
 
@@ -30,7 +32,8 @@ function EditItemModal({ item, categories, onClose, onSave }) {
       description,
       price: Number(price),
       imageUrl,
-      categoryId
+      categoryId,
+      dietaryTags: dietaryTags.split(',').map(t => t.trim()).filter(t => t)
     };
 
     await onSave(item._id, updatedData);
@@ -107,6 +110,18 @@ function EditItemModal({ item, categories, onClose, onSave }) {
                 placeholder="https://example.com/image.jpg"
               />
             </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Dietary Tags (comma separated)</label>
+            <input 
+              type="text" 
+              value={dietaryTags}
+              onChange={e => setDietaryTags(e.target.value)}
+              className="admin-input" 
+              style={{ width: '100%' }}
+              placeholder="e.g. Vegan, Gluten-Free"
+            />
           </div>
           
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '16px' }}>

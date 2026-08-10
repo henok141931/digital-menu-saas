@@ -24,7 +24,7 @@ function AdminPanel() {
   const [newItemPrice, setNewItemPrice] = useState('');
   const [newItemImage, setNewItemImage] = useState('');
   const [newItemCatId, setNewItemCatId] = useState('');
-  const [newItemDietary, setNewItemDietary] = useState([]);
+  const [newItemDietary, setNewItemDietary] = useState('');
   const [isItemSubmitting, setIsItemSubmitting] = useState(false);
   
   const [editingItem, setEditingItem] = useState(null);
@@ -78,13 +78,14 @@ function AdminPanel() {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      transformHeader: (header) => header.trim().toLowerCase(),
       complete: async (results) => {
-        const expectedHeaders = ['Category', 'ItemName', 'Description', 'Price', 'DietaryTags'];
+        const expectedHeaders = ['category', 'itemname', 'description', 'price', 'dietarytags'];
         const headers = results.meta.fields;
         const isValid = expectedHeaders.every(h => headers.includes(h));
         
         if (!isValid) {
-          showToast('Invalid CSV format. Please use the exact template.', 'error');
+          showToast('Invalid CSV format. Please ensure you have the correct columns (Category, ItemName, Description, Price, DietaryTags).', 'error');
           return;
         }
         
@@ -221,7 +222,7 @@ function AdminPanel() {
           imageUrl: newItemImage || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3', // Fallback image
           categoryId: newItemCatId,
           restaurantId,
-          dietaryTags: newItemDietary
+          dietaryTags: newItemDietary.split(',').map(t => t.trim()).filter(t => t)
         })
       });
 
@@ -234,7 +235,7 @@ function AdminPanel() {
       setNewItemDesc('');
       setNewItemPrice('');
       setNewItemImage('');
-      setNewItemDietary([]);
+      setNewItemDietary('');
       await fetchMenu();
       showToast('Menu item added successfully!');
     } catch (err) {
@@ -653,30 +654,13 @@ function AdminPanel() {
               ))}
             </select>
 
-            <div style={{ display: 'flex', gap: '16px', color: 'var(--text-main)' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input 
-                  type="checkbox" 
-                  checked={newItemDietary.includes('Fasting')}
-                  onChange={(e) => {
-                    if (e.target.checked) setNewItemDietary(prev => [...prev, 'Fasting']);
-                    else setNewItemDietary(prev => prev.filter(t => t !== 'Fasting'));
-                  }}
-                />
-                Fasting (Vegetarian)
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input 
-                  type="checkbox" 
-                  checked={newItemDietary.includes('Non-Fasting')}
-                  onChange={(e) => {
-                    if (e.target.checked) setNewItemDietary(prev => [...prev, 'Non-Fasting']);
-                    else setNewItemDietary(prev => prev.filter(t => t !== 'Non-Fasting'));
-                  }}
-                />
-                Non-Fasting (Non-Vegetarian)
-              </label>
-            </div>
+            <input 
+              type="text" 
+              placeholder="Dietary Tags (comma separated, e.g. Vegan, Gluten-Free)" 
+              value={newItemDietary}
+              onChange={(e) => setNewItemDietary(e.target.value)}
+              className="admin-input"
+            />
 
             <button type="submit" className="add-btn primary" disabled={isItemSubmitting} style={{ alignSelf: 'flex-start' }}>
               {isItemSubmitting ? 'Adding...' : '+ Menu Item'}
