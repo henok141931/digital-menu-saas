@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import BaseModal from './BaseModal';
 import './App.css';
 
 function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
@@ -74,9 +75,8 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
   if (!item) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1100 }}>
-      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()} style={{ padding: '24px' }}>
-        <h2 style={{ marginBottom: '20px', color: 'var(--text-main)', fontSize: '20px' }}>Edit Menu Item</h2>
+    <BaseModal isOpen={true} onClose={onClose}>
+      <h2 style={{ marginBottom: '20px', color: 'var(--text-main)', fontSize: '20px' }}>Edit Menu Item</h2>
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
@@ -180,8 +180,7 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </BaseModal>
   );
 }
 

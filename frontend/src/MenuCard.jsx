@@ -1,6 +1,6 @@
 export default function MenuCard({ item, onClick }) {
   return (
-    <div className="menu-card" onClick={(e) => onClick(item, e)}>
+    <div className="menu-card" onClick={() => onClick(item)}>
       <div className="card-info">
         <div className="card-header">
           <h3>{item.name}</h3>

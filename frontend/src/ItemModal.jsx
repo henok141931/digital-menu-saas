@@ -1,18 +1,16 @@
 import React from 'react';
+import BaseModal from './BaseModal';
 
-export default function ItemModal({ item, onClose, originStyle }) {
+export default function ItemModal({ item, onClose }) {
   if (!item) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose} style={originStyle ? { background: 'transparent' } : {}}>
-      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()} style={originStyle || {}}>
-        <button className="close-btn" onClick={onClose}>&times;</button>
-        
-        {item.imageUrl && (
-          <img src={item.imageUrl} alt={item.name} className="modal-image" />
-        )}
-        
-        <h2 className="modal-title">{item.name}</h2>
+    <BaseModal isOpen={!!item} onClose={onClose}>
+      {item.imageUrl && (
+        <img src={item.imageUrl} alt={item.name} className="modal-image" />
+      )}
+      
+      <h2 className="modal-title">{item.name}</h2>
         <span className="modal-price">{item.price} ETB</span>
         
         <p className="modal-desc">{item.description}</p>
@@ -26,7 +24,6 @@ export default function ItemModal({ item, onClose, originStyle }) {
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </BaseModal>
   );
 }
