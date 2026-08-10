@@ -1,11 +1,11 @@
 import React from 'react';
 
-export default function ItemModal({ item, onClose }) {
+export default function ItemModal({ item, onClose, originStyle }) {
   if (!item) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} style={originStyle ? { background: 'transparent' } : {}}>
+      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()} style={originStyle || {}}>
         <button className="close-btn" onClick={onClose}>&times;</button>
         
         {item.imageUrl && (

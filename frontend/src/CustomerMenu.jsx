@@ -19,6 +19,34 @@ function CustomerMenu() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [modalOrigin, setModalOrigin] = useState(null);
+
+  const handleOpenAnchoredModal = (e, action) => {
+    if (e && e.currentTarget) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      
+      // Calculate position relative to viewport (fixed positioning)
+      let top = rect.bottom + 10;
+      let left = Math.max(16, rect.left); // prevent going off left edge
+      
+      // If clicking near bottom of screen, show above
+      if (rect.bottom > window.innerHeight - 300) {
+        top = 'auto';
+      }
+
+      setModalOrigin({ 
+        top: top !== 'auto' ? `${top}px` : 'auto', 
+        bottom: top === 'auto' ? `${window.innerHeight - rect.top + 10}px` : 'auto',
+        left: `${left}px`,
+        maxWidth: `calc(100vw - 32px)`,
+        position: 'fixed',
+        margin: 0
+      });
+    } else {
+      setModalOrigin(null);
+    }
+    action();
+  };
 
   // Refs for ScrollSpy
   const categoryRefs = useRef({});
@@ -123,22 +151,22 @@ function CustomerMenu() {
         <p>{restaurant.description || 'Welcome to our menu'}</p>
         
         <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '16px' }}>
-          {restaurant.paymentMethods && restaurant.paymentMethods.length > 0 && (
+            {restaurant.paymentMethods && restaurant.paymentMethods.length > 0 && (
+              <button 
+                onClick={(e) => handleOpenAnchoredModal(e, () => setShowPaymentModal(true))} 
+                className="add-btn" 
+                style={{ padding: '8px 16px', background: 'var(--brand-color)', color: '#fff', border: 'none', borderRadius: '20px', fontSize: '14px', fontWeight: '500' }}
+              >
+                Payment Info
+              </button>
+            )}
             <button 
-              onClick={() => setShowPaymentModal(true)} 
+              onClick={(e) => handleOpenAnchoredModal(e, () => setShowFeedbackModal(true))} 
               className="add-btn" 
-              style={{ padding: '8px 16px', background: 'var(--brand-color)', color: '#fff', border: 'none', borderRadius: '20px', fontSize: '14px', fontWeight: '500' }}
+              style={{ padding: '8px 16px', background: 'transparent', color: 'var(--brand-color)', border: '1px solid var(--brand-color)', borderRadius: '20px', fontSize: '14px', fontWeight: '500' }}
             >
-              Payment Info
+              Leave Feedback
             </button>
-          )}
-          <button 
-            onClick={() => setShowFeedbackModal(true)} 
-            className="add-btn" 
-            style={{ padding: '8px 16px', background: 'transparent', color: 'var(--brand-color)', border: '1px solid var(--brand-color)', borderRadius: '20px', fontSize: '14px', fontWeight: '500' }}
-          >
-            Leave Feedback
-          </button>
         </div>
       </header>
 
@@ -191,7 +219,7 @@ function CustomerMenu() {
                 <MenuCard 
                   key={item._id} 
                   item={item} 
-                  onClick={(i) => setSelectedItem(i)}
+                  onClick={(i, e) => handleOpenAnchoredModal(e, () => setSelectedItem(i))}
                 />
               ))}
             </div>
@@ -206,9 +234,9 @@ function CustomerMenu() {
         </div>
       )}
 
-      {showPaymentModal && <PaymentModal restaurant={restaurant} onClose={() => setShowPaymentModal(false)} />}
-      {showFeedbackModal && <FeedbackModal restaurant={restaurant} onClose={() => setShowFeedbackModal(false)} />}
-      <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+      {showPaymentModal && <PaymentModal restaurant={restaurant} onClose={() => setShowPaymentModal(false)} originStyle={modalOrigin} />}
+      {showFeedbackModal && <FeedbackModal restaurant={restaurant} onClose={() => setShowFeedbackModal(false)} originStyle={modalOrigin} />}
+      <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} originStyle={modalOrigin} />
       
       <Footer restaurant={restaurant} />
     </div>

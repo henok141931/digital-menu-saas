@@ -2,7 +2,7 @@ import { BASE_URL } from './config';
 import { useState } from 'react';
 import './App.css';
 
-function FeedbackModal({ restaurant, onClose }) {
+function FeedbackModal({ restaurant, onClose, originStyle }) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [customerName, setCustomerName] = useState('');
@@ -39,8 +39,8 @@ function FeedbackModal({ restaurant, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000 }}>
-      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()} style={{ padding: '24px' }}>
+    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000, ...(originStyle ? { background: 'transparent' } : {}) }}>
+      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()} style={{ padding: '24px', ...(originStyle || {}) }}>
         <h2 style={{ marginBottom: '16px', color: 'var(--text-main)', textAlign: 'center' }}>Leave Feedback</h2>
         
         {isSuccess ? (

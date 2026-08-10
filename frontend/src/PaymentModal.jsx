@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 
-function PaymentModal({ restaurant, onClose }) {
+function PaymentModal({ restaurant, onClose, originStyle }) {
   const [copiedIndex, setCopiedIndex] = useState(null);
 
   if (!restaurant) return null;
@@ -13,8 +13,8 @@ function PaymentModal({ restaurant, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000 }}>
-      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()} style={{ padding: '24px', textAlign: 'center' }}>
+    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000, ...(originStyle ? { background: 'transparent' } : {}) }}>
+      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()} style={{ padding: '24px', textAlign: 'center', ...(originStyle || {}) }}>
         <h2 style={{ marginBottom: '16px', color: 'var(--text-main)' }}>Payment Information</h2>
         <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>Please use the following accounts to make your payment.</p>
 
