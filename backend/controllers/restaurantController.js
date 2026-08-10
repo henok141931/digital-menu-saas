@@ -46,9 +46,9 @@ export const getRestaurantBySlug = async (req, res) => {
   }
 };
 
-// @desc    Update restaurant brand color
-// @route   PUT /api/restaurants/:id/color
-export const updateBrandColor = async (req, res) => {
+// @desc    Update restaurant settings
+// @route   PUT /api/restaurants/:id
+export const updateRestaurantSettings = async (req, res) => {
   try {
     const { id } = req.params;
     const { brandColor, secondaryColor, paymentMethods, contactPhone, contactEmail, socialLinks } = req.body;

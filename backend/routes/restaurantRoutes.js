@@ -2,7 +2,7 @@ import express from 'express';
 import {
   createRestaurant,
   getRestaurantBySlug,
-  updateBrandColor,
+  updateRestaurantSettings,
   getAllRestaurants
 } from '../controllers/restaurantController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
@@ -29,7 +29,7 @@ router.get('/id/:id', async (req, res) => {
   }
 });
 
-// PUT /api/restaurants/:id/color -> Updates brand color (Admin only)
-router.put('/:id/color', protect, authorize('SUPER_ADMIN', 'ADMIN'), updateBrandColor);
+// PUT /api/restaurants/:id -> Updates settings (Admin only)
+router.put('/:id', protect, authorize('SUPER_ADMIN', 'ADMIN'), updateRestaurantSettings);
 
 export default router;

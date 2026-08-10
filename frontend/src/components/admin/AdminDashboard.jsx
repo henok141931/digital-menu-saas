@@ -47,7 +47,7 @@ export default function AdminDashboard() {
       // If super admin and no specific restaurant selected, this might need handling
       // For now, assume a restaurant context exists for Admin
       
-      const resRes = await fetch(`${BASE_URL}/api/restaurants/${restaurantId}`, {
+      const resRes = await fetch(`${BASE_URL}/api/restaurants/id/${restaurantId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!resRes.ok) throw new Error('Failed to fetch restaurant settings');
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
   const refreshRestaurant = async () => {
     const token = localStorage.getItem('token');
     const restaurantId = localStorage.getItem('restaurantId');
-    const resRes = await fetch(`${BASE_URL}/api/restaurants/${restaurantId}`, {
+    const resRes = await fetch(`${BASE_URL}/api/restaurants/id/${restaurantId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (resRes.ok) {
