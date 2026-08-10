@@ -21,16 +21,20 @@
 .sidebar-header {
   padding: 24px 20px;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .sidebar-header h2 {
   font-size: 1.25rem;
   font-weight: 700;
-  margin: 0 0 4px 0;
+  margin: 0;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
 }
 
 .badge {
@@ -131,63 +135,65 @@
   padding: 24px;
 }
 
-/* Mobile Bottom Navigation */
-.mobile-bottom-nav {
-  display: none;
-  background: var(--bg-card, #ffffff);
-  border-top: 1px solid var(--border-color, #e2e8f0);
-  z-index: 10;
-}
-
-.bottom-nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 10px 4px;
+.hamburger-btn {
   background: transparent;
   border: none;
-  color: var(--text-muted, #64748b);
+  font-size: 1.5rem;
+  color: var(--text-main);
   cursor: pointer;
-  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
 }
 
-.bottom-nav-item .nav-icon {
+.close-sidebar-btn {
+  display: none;
+  background: transparent;
+  border: none;
   font-size: 1.25rem;
+  color: var(--text-muted);
+  cursor: pointer;
 }
 
-.bottom-nav-item .nav-label {
-  font-size: 0.65rem;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-}
-
-.bottom-nav-item.active {
-  color: var(--brand-color, #3b82f6);
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 15;
 }
 
 /* Responsive Rules */
 @media (max-width: 768px) {
   .admin-sidebar {
-    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 20;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .close-sidebar-btn {
+    display: block;
+  }
+  
+  .sidebar-backdrop {
+    display: block;
   }
   
   .mobile-header {
     display: flex;
   }
   
-  .mobile-bottom-nav {
-    display: flex;
-    justify-content: space-around;
-  }
-  
   .tab-container {
     padding: 16px;
-    padding-bottom: 80px; /* space for bottom nav */
   }
 }
