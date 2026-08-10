@@ -123,7 +123,7 @@ function CustomerMenu() {
       <div className="menu-container" style={{ paddingBottom: '100px' }}>
         <div className="animate-slide-up">
           <header className="customer-hero">
-        <div className="hero-glass">
+        <div className="hero-content">
           <h1>{restaurant.name}</h1>
           <p>{restaurant.description || 'Welcome to our menu'}</p>
         </div>
