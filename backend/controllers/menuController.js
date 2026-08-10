@@ -164,3 +164,80 @@ export const updateMenuItem = async (req, res) => {
     res.status(500).json({ message: 'Server Error: ' + error.message });
   }
 };
+
+// @desc    Bulk upload menu items from CSV
+// @route   POST /api/menu/bulk
+export const bulkUploadMenu = async (req, res) => {
+  try {
+    const { items } = req.body;
+    const restaurantId = req.user.restaurantId;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: 'No items provided for upload' });
+    }
+
+    let itemsCreated = 0;
+    let categoriesCreated = 0;
+
+    // Cache categories to prevent duplicate creations in the same loop
+    const categoryCache = {};
+
+    for (const row of items) {
+      if (!row.Category || !row.ItemName) continue; // Skip invalid rows
+
+      let categoryId;
+      const categoryName = row.Category.trim();
+
+      // Check if we already created it in this loop
+      if (categoryCache[categoryName]) {
+        categoryId = categoryCache[categoryName];
+      } else {
+        // Find existing category in DB
+        let category = await Category.findOne({ restaurantId, name: categoryName });
+        
+        if (!category) {
+          category = await Category.create({
+            restaurantId,
+            name: categoryName,
+            sortOrder: categoriesCreated // simple sort order
+          });
+          categoriesCreated++;
+        }
+        
+        categoryId = category._id;
+        categoryCache[categoryName] = categoryId;
+      }
+
+      // Parse price, default to 0 if invalid
+      let parsedPrice = parseFloat(row.Price);
+      if (isNaN(parsedPrice)) parsedPrice = 0;
+
+      // Parse dietary tags
+      let parsedTags = [];
+      if (row.DietaryTags) {
+        parsedTags = row.DietaryTags.split(',').map(tag => tag.trim()).filter(t => t);
+      }
+
+      // Create item
+      await MenuItem.create({
+        restaurantId,
+        categoryId,
+        name: row.ItemName.trim(),
+        description: row.Description ? row.Description.trim() : '',
+        price: parsedPrice,
+        dietaryTags: parsedTags,
+        sortOrder: itemsCreated,
+        imageUrl: null
+      });
+      itemsCreated++;
+    }
+
+    res.status(201).json({ 
+      message: `Bulk upload successful. Created ${categoriesCreated} new categories and ${itemsCreated} items.`,
+      categoriesCreated,
+      itemsCreated
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: ' + error.message });
+  }
+};

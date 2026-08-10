@@ -6,6 +6,7 @@ import EditItemModal from './EditItemModal';
 import Toast from './Toast';
 import ConfirmModal from './ConfirmModal';
 import PromptModal from './PromptModal';
+import Papa from 'papaparse';
 import './App.css';
 
 function AdminPanel() {
@@ -46,6 +47,75 @@ function AdminPanel() {
 
   // Feedback State
   const [feedbacks, setFeedbacks] = useState([]);
+
+  // Bulk Upload State
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploadingCSV, setIsUploadingCSV] = useState(false);
+
+  const handleDownloadTemplate = () => {
+    const csvContent = "data:text/csv;charset=utf-8,Category,ItemName,Description,Price,DietaryTags\nStarters,Garlic Bread,Crispy bread with garlic butter,5.99,Fasting\nMains,Margherita Pizza,Classic cheese and tomato pizza,12.99,Fasting\nMains,Chicken Wings,Spicy buffalo wings,8.99,Non-Fasting";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "menu_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file && (file.type === "text/csv" || file.name.endsWith('.csv'))) {
+      processCSV(file);
+    } else {
+      showToast('Please upload a valid CSV file', 'error');
+    }
+  };
+
+  const processCSV = (file) => {
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const expectedHeaders = ['Category', 'ItemName', 'Description', 'Price', 'DietaryTags'];
+        const headers = results.meta.fields;
+        const isValid = expectedHeaders.every(h => headers.includes(h));
+        
+        if (!isValid) {
+          showToast('Invalid CSV format. Please use the exact template.', 'error');
+          return;
+        }
+        
+        setIsUploadingCSV(true);
+        try {
+          const res = await fetch(`${BASE_URL}/api/menu/bulk`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ items: results.data })
+          });
+          
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Failed to upload CSV');
+          
+          showToast(data.message, 'success');
+          await fetchMenu();
+        } catch (err) {
+          showToast(err.message, 'error');
+        } finally {
+          setIsUploadingCSV(false);
+          document.getElementById('csvFileInput').value = '';
+        }
+      },
+      error: () => {
+        showToast('Error parsing CSV file', 'error');
+      }
+    });
+  };
 
   // UI Dialog State
   const [toast, setToast] = useState({ message: '', type: 'success' });
@@ -465,6 +535,49 @@ function AdminPanel() {
               {isColorSubmitting ? 'Saving...' : 'Save Settings'}
             </button>
           </form>
+        </section>
+
+        {/* BULK UPLOAD CSV */}
+        <section className="menu-card glass-panel animate-slide-up" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 style={{ margin: 0, fontSize: '20px' }}>Bulk Upload Menu (CSV)</h2>
+            <button onClick={handleDownloadTemplate} type="button" className="add-btn" style={{ background: 'transparent', border: '1px solid var(--text-muted)', fontSize: '13px', padding: '6px 12px' }}>
+              Download Template
+            </button>
+          </div>
+          
+          <div 
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
+            onDrop={handleDrop}
+            style={{ 
+              width: '100%', 
+              padding: '40px 20px', 
+              border: `2px dashed ${isDragging ? 'var(--brand-color)' : 'var(--text-muted)'}`, 
+              borderRadius: '12px', 
+              textAlign: 'center',
+              backgroundColor: isDragging ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer'
+            }}
+            onClick={() => document.getElementById('csvFileInput').click()}
+          >
+            {isUploadingCSV ? (
+              <p style={{ color: 'var(--brand-color)', margin: 0 }}>Processing CSV Upload...</p>
+            ) : (
+              <>
+                <p style={{ color: 'var(--text-main)', margin: '0 0 8px 0', fontWeight: 'bold', fontSize: '16px' }}>Drag & Drop your filled CSV here</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>or click to browse files</p>
+              </>
+            )}
+            <input 
+              type="file" 
+              id="csvFileInput" 
+              accept=".csv" 
+              style={{ display: 'none' }} 
+              onChange={(e) => e.target.files[0] && processCSV(e.target.files[0])}
+            />
+          </div>
         </section>
 
         {/* ADD CATEGORY FORM */}

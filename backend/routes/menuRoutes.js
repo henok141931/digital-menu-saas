@@ -6,7 +6,8 @@ import {
   deleteCategory,
   deleteMenuItem,
   updateCategory,
-  updateMenuItem
+  updateMenuItem,
+  bulkUploadMenu
 } from '../controllers/menuController.js';
 import { protect, authorize, tenantScope } from '../middleware/authMiddleware.js';
 
@@ -23,6 +24,9 @@ router.put('/categories/:id', protect, authorize('SUPER_ADMIN', 'ADMIN'), update
 
 // POST /api/menu/items -> Adds a menu item (Admin only)
 router.post('/items', protect, authorize('SUPER_ADMIN', 'ADMIN'), tenantScope, createMenuItem);
+
+// POST /api/menu/bulk -> Bulk uploads menu items (Admin only)
+router.post('/bulk', protect, authorize('SUPER_ADMIN', 'ADMIN'), tenantScope, bulkUploadMenu);
 
 // DELETE /api/menu/items/:id -> Deletes a menu item (Admin only)
 router.delete('/items/:id', protect, authorize('SUPER_ADMIN', 'ADMIN'), deleteMenuItem);
