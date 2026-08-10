@@ -10,7 +10,7 @@ import Papa from 'papaparse';
 import './App.css';
 
 function AdminPanel() {
-  const [menuData, setMenuData] = useState({ categories: [], items: [] });
+  const [menuData, setMenuData] = useState({ categories: [], items: [], tags: [] });
   const [restaurantData, setRestaurantData] = useState(null);
   const [error, setError] = useState(null);
   
@@ -18,13 +18,17 @@ function AdminPanel() {
   const [newCatName, setNewCatName] = useState('');
   const [isCatSubmitting, setIsCatSubmitting] = useState(false);
 
+  // Tag Form State
+  const [newTagName, setNewTagName] = useState('');
+  const [isTagSubmitting, setIsTagSubmitting] = useState(false);
+
   // Item Form State
   const [newItemName, setNewItemName] = useState('');
   const [newItemDesc, setNewItemDesc] = useState('');
   const [newItemPrice, setNewItemPrice] = useState('');
   const [newItemImage, setNewItemImage] = useState('');
   const [newItemCatId, setNewItemCatId] = useState('');
-  const [newItemDietary, setNewItemDietary] = useState('');
+  const [newItemDietary, setNewItemDietary] = useState([]);
   const [isItemSubmitting, setIsItemSubmitting] = useState(false);
   
   const [editingItem, setEditingItem] = useState(null);
@@ -202,6 +206,53 @@ function AdminPanel() {
     }
   };
 
+  const handleAddTag = async (e) => {
+    e.preventDefault();
+    if (!newTagName) return;
+    setIsTagSubmitting(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/menu/tags`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: newTagName, restaurantId })
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      setNewTagName('');
+      await fetchMenu();
+      showToast('Dietary tag added successfully!');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsTagSubmitting(false);
+    }
+  };
+
+  const handleDeleteTag = (tagId) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Dietary Tag',
+      message: 'Are you sure? This tag will be removed from all menu items.',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          const res = await fetch(`${BASE_URL}/api/menu/tags/${tagId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (!res.ok) throw new Error('Failed to delete tag');
+          await fetchMenu();
+          showToast('Tag deleted successfully');
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+    });
+  };
+
   const handleAddItem = async (e) => {
     e.preventDefault();
     if (!newItemName || !newItemPrice || !newItemCatId) return;
@@ -222,7 +273,7 @@ function AdminPanel() {
           imageUrl: newItemImage || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3', // Fallback image
           categoryId: newItemCatId,
           restaurantId,
-          dietaryTags: newItemDietary.split(',').map(t => t.trim()).filter(t => t)
+          dietaryTags: newItemDietary
         })
       });
 
@@ -235,7 +286,7 @@ function AdminPanel() {
       setNewItemDesc('');
       setNewItemPrice('');
       setNewItemImage('');
-      setNewItemDietary('');
+      setNewItemDietary([]);
       await fetchMenu();
       showToast('Menu item added successfully!');
     } catch (err) {
@@ -600,6 +651,25 @@ function AdminPanel() {
           </form>
         </section>
 
+        {/* ADD TAG FORM */}
+        <section className="menu-card glass-panel animate-slide-up" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '24px' }}>
+          <h2 style={{ margin: '0 0 16px 0', fontSize: '20px' }}>Add New Dietary Tag</h2>
+          <form onSubmit={handleAddTag} style={{ display: 'flex', gap: '12px', width: '100%' }}>
+            <input 
+              type="text" 
+              placeholder="Tag Name (e.g., Vegan, Spicy)" 
+              value={newTagName}
+              onChange={(e) => setNewTagName(e.target.value)}
+              required
+              className="admin-input"
+              style={{ flex: 1 }}
+            />
+            <button type="submit" className="add-btn primary" disabled={isTagSubmitting} style={{ whiteSpace: 'nowrap' }}>
+              {isTagSubmitting ? 'Adding...' : '+ Tag'}
+            </button>
+          </form>
+        </section>
+
         {/* ADD ITEM FORM */}
         <section className="menu-card glass-panel animate-slide-up" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '24px', animationDelay: '0.1s' }}>
           <h2 style={{ margin: '0 0 16px 0', fontSize: '20px' }}>Add New Menu Item</h2>
@@ -654,13 +724,25 @@ function AdminPanel() {
               ))}
             </select>
 
-            <input 
-              type="text" 
-              placeholder="Dietary Tags (comma separated, e.g. Vegan, Gluten-Free)" 
-              value={newItemDietary}
-              onChange={(e) => setNewItemDietary(e.target.value)}
-              className="admin-input"
-            />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', color: 'var(--text-main)', marginBottom: '16px' }}>
+              <span style={{ fontSize: '14px', width: '100%', marginBottom: '-8px' }}>Dietary Tags:</span>
+              {menuData.tags && menuData.tags.map(tag => (
+                <label key={tag._id} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={newItemDietary.includes(tag.name)}
+                    onChange={(e) => {
+                      if (e.target.checked) setNewItemDietary(prev => [...prev, tag.name]);
+                      else setNewItemDietary(prev => prev.filter(t => t !== tag.name));
+                    }}
+                  />
+                  {tag.name}
+                </label>
+              ))}
+              {(!menuData.tags || menuData.tags.length === 0) && (
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No tags available. Add some above!</span>
+              )}
+            </div>
 
             <button type="submit" className="add-btn primary" disabled={isItemSubmitting} style={{ alignSelf: 'flex-start' }}>
               {isItemSubmitting ? 'Adding...' : '+ Menu Item'}
@@ -670,7 +752,22 @@ function AdminPanel() {
 
         {/* CURRENT MENU VIEW */}
         <section className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <h2 style={{ marginBottom: '16px' }}>Current Menu</h2>
+          <h2 style={{ marginBottom: '16px' }}>Current Menu & Tags</h2>
+          
+          {menuData.tags && menuData.tags.length > 0 && (
+            <div className="glass-panel" style={{ marginBottom: '24px', padding: '20px' }}>
+              <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '12px' }}>Dietary Tags</h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {menuData.tags.map(tag => (
+                  <div key={tag._id} style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '6px 12px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-main)' }}>
+                    {tag.name}
+                    <button onClick={() => handleDeleteTag(tag._id)} style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '16px', lineHeight: 1, padding: 0 }}>&times;</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {menuData.categories.map(cat => (
             <div key={cat._id} className="glass-panel" style={{ marginBottom: '24px', padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--glass-border)' }}>
@@ -740,6 +837,7 @@ function AdminPanel() {
         <EditItemModal 
           item={editingItem}
           categories={menuData.categories}
+          tags={menuData.tags}
           onClose={() => setEditingItem(null)}
           onSave={handleSaveItemEdit}
         />

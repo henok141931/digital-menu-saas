@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
-function EditItemModal({ item, categories, onClose, onSave }) {
+function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [dietaryTags, setDietaryTags] = useState('');
+  const [dietaryTags, setDietaryTags] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ function EditItemModal({ item, categories, onClose, onSave }) {
       setPrice(item.price || '');
       setImageUrl(item.imageUrl || '');
       setCategoryId(item.categoryId || '');
-      setDietaryTags((item.dietaryTags || []).join(', '));
+      setDietaryTags(item.dietaryTags || []);
     }
   }, [item]);
 
@@ -33,7 +33,7 @@ function EditItemModal({ item, categories, onClose, onSave }) {
       price: Number(price),
       imageUrl,
       categoryId,
-      dietaryTags: dietaryTags.split(',').map(t => t.trim()).filter(t => t)
+      dietaryTags
     };
 
     await onSave(item._id, updatedData);
@@ -113,15 +113,25 @@ function EditItemModal({ item, categories, onClose, onSave }) {
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Dietary Tags (comma separated)</label>
-            <input 
-              type="text" 
-              value={dietaryTags}
-              onChange={e => setDietaryTags(e.target.value)}
-              className="admin-input" 
-              style={{ width: '100%' }}
-              placeholder="e.g. Vegan, Gluten-Free"
-            />
+            <span style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Dietary Tags</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', color: 'var(--text-main)' }}>
+              {tags && tags.map(tag => (
+                <label key={tag._id} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={dietaryTags.includes(tag.name)}
+                    onChange={(e) => {
+                      if (e.target.checked) setDietaryTags(prev => [...prev, tag.name]);
+                      else setDietaryTags(prev => prev.filter(t => t !== tag.name));
+                    }}
+                  />
+                  {tag.name}
+                </label>
+              ))}
+              {(!tags || tags.length === 0) && (
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No tags available. Add some in the Admin Panel!</span>
+              )}
+            </div>
           </div>
           
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '16px' }}>

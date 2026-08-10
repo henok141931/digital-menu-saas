@@ -1,5 +1,6 @@
 import Category from '../models/Category.js';
 import MenuItem from '../models/MenuItem.js';
+import DietaryTag from '../models/DietaryTag.js';
 
 // @desc    Create a new category for a restaurant
 // @route   POST /api/menu/categories
@@ -42,7 +43,7 @@ export const createMenuItem = async (req, res) => {
   }
 };
 
-// @desc    Get full menu (categories + items) for a restaurant
+// @desc    Get all categories, items, and dietary tags for a restaurant
 // @route   GET /api/menu/:restaurantId
 export const getFullMenu = async (req, res) => {
   try {
@@ -50,8 +51,9 @@ export const getFullMenu = async (req, res) => {
 
     const categories = await Category.find({ restaurantId, isActive: true }).sort({ sortOrder: 1 });
     const items = await MenuItem.find({ restaurantId, isAvailable: true }).sort({ sortOrder: 1 });
+    const tags = await DietaryTag.find({ restaurantId });
 
-    res.status(200).json({ categories, items });
+    res.status(200).json({ categories, items, tags });
   } catch (error) {
     res.status(500).json({ message: 'Server Error: ' + error.message });
   }
@@ -165,6 +167,46 @@ export const updateMenuItem = async (req, res) => {
   }
 };
 
+// @desc    Create a dietary tag
+// @route   POST /api/menu/tags
+export const createDietaryTag = async (req, res) => {
+  try {
+    const { name, restaurantId } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ message: 'Tag name is required' });
+    }
+
+    const newTag = await DietaryTag.create({ name, restaurantId });
+    res.status(201).json(newTag);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: ' + error.message });
+  }
+};
+
+// @desc    Delete a dietary tag
+// @route   DELETE /api/menu/tags/:id
+export const deleteDietaryTag = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const tag = await DietaryTag.findOneAndDelete({ _id: id, restaurantId: req.user.restaurantId });
+    
+    if (!tag) {
+      return res.status(404).json({ message: 'Tag not found' });
+    }
+
+    // Remove this tag string from all menu items in this restaurant
+    await MenuItem.updateMany(
+      { restaurantId: req.user.restaurantId },
+      { $pull: { dietaryTags: tag.name } }
+    );
+
+    res.status(200).json({ message: 'Tag removed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: ' + error.message });
+  }
+};
+
 // @desc    Bulk upload menu items from CSV
 // @route   POST /api/menu/bulk
 export const bulkUploadMenu = async (req, res) => {
@@ -179,8 +221,9 @@ export const bulkUploadMenu = async (req, res) => {
     let itemsCreated = 0;
     let categoriesCreated = 0;
 
-    // Cache categories to prevent duplicate creations in the same loop
+    // Cache to prevent duplicate creations in the same loop
     const categoryCache = {};
+    const tagCache = {};
 
     for (const row of items) {
       if (!row.category || !row.itemname) continue; // Skip invalid rows
@@ -212,10 +255,20 @@ export const bulkUploadMenu = async (req, res) => {
       let parsedPrice = parseFloat(row.price);
       if (isNaN(parsedPrice)) parsedPrice = 0;
 
-      // Parse dietary tags
+      // Parse dietary tags and auto-create them if missing
       let parsedTags = [];
       if (row.dietarytags) {
-        parsedTags = row.dietarytags.split(',').map(tag => tag.trim()).filter(t => t);
+        const rawTags = row.dietarytags.split(',').map(tag => tag.trim()).filter(t => t);
+        for (const tagName of rawTags) {
+          if (!tagCache[tagName]) {
+            let existingTag = await DietaryTag.findOne({ restaurantId, name: tagName });
+            if (!existingTag) {
+              await DietaryTag.create({ restaurantId, name: tagName });
+            }
+            tagCache[tagName] = true;
+          }
+          parsedTags.push(tagName);
+        }
       }
 
       // Create item
