@@ -119,8 +119,10 @@ function CustomerMenu() {
   const searchLower = searchQuery.toLowerCase();
   
   return (
-    <div className="menu-container animate-slide-up" style={{ paddingBottom: '100px' }}>
-      <header className="customer-hero">
+    <>
+      <div className="menu-container" style={{ paddingBottom: '100px' }}>
+        <div className="animate-slide-up">
+          <header className="customer-hero">
         <div className="hero-glass">
           <h1>{restaurant.name}</h1>
           <p>{restaurant.description || 'Welcome to our menu'}</p>
@@ -191,6 +193,7 @@ function CustomerMenu() {
           No items found matching "{searchQuery}"
         </div>
       )}
+      </div> {/* Close animate-slide-up */}
 
       {/* Floating Action Bar (FAB) */}
       <div className="fab-container">
@@ -212,6 +215,7 @@ function CustomerMenu() {
       
       <Footer restaurant={restaurant} />
     </div>
+    </>
   );
 }
 
