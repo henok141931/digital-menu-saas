@@ -6,6 +6,8 @@ import ItemModal from './ItemModal';
 import PaymentModal from './PaymentModal';
 import FeedbackModal from './FeedbackModal';
 import Footer from './Footer';
+import { motion, AnimatePresence } from 'framer-motion';
+import './CustomerMenuUI.css';
 
 function CustomerMenu() {
   const { slug } = useParams();
@@ -117,28 +119,11 @@ function CustomerMenu() {
   const searchLower = searchQuery.toLowerCase();
   
   return (
-    <div className="menu-container animate-slide-up">
-      <header className="menu-header">
-        <h1>{restaurant.name}</h1>
-        <p>{restaurant.description || 'Welcome to our menu'}</p>
-        
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '16px' }}>
-            {restaurant.paymentMethods && restaurant.paymentMethods.length > 0 && (
-              <button 
-                onClick={() => setShowPaymentModal(true)} 
-                className="add-btn" 
-                style={{ padding: '8px 16px', background: 'var(--brand-color)', color: '#fff', border: 'none', borderRadius: '20px', fontSize: '14px', fontWeight: '500' }}
-              >
-                Payment Info
-              </button>
-            )}
-            <button 
-              onClick={() => setShowFeedbackModal(true)} 
-              className="add-btn" 
-              style={{ padding: '8px 16px', background: 'transparent', color: 'var(--brand-color)', border: '1px solid var(--brand-color)', borderRadius: '20px', fontSize: '14px', fontWeight: '500' }}
-            >
-              Leave Feedback
-            </button>
+    <div className="menu-container animate-slide-up" style={{ paddingBottom: '100px' }}>
+      <header className="customer-hero">
+        <div className="hero-glass">
+          <h1>{restaurant.name}</h1>
+          <p>{restaurant.description || 'Welcome to our menu'}</p>
         </div>
       </header>
 
@@ -187,10 +172,11 @@ function CustomerMenu() {
           >
             <h2 className="category-title">{cat.name}</h2>
             <div>
-              {categoryItems.map(item => (
+              {categoryItems.map((item, index) => (
                 <MenuCard 
                   key={item._id} 
                   item={item} 
+                  index={index}
                   onClick={(i) => setSelectedItem(i)}
                 />
               ))}
@@ -206,9 +192,23 @@ function CustomerMenu() {
         </div>
       )}
 
-      {showPaymentModal && <PaymentModal restaurant={restaurant} onClose={() => setShowPaymentModal(false)} />}
-      {showFeedbackModal && <FeedbackModal restaurant={restaurant} onClose={() => setShowFeedbackModal(false)} />}
-      <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+      {/* Floating Action Bar (FAB) */}
+      <div className="fab-container">
+        {restaurant.paymentMethods && restaurant.paymentMethods.length > 0 && (
+          <button onClick={() => setShowPaymentModal(true)} className="fab-btn secondary">
+            <i className="fa-solid fa-credit-card"></i> Payment
+          </button>
+        )}
+        <button onClick={() => setShowFeedbackModal(true)} className="fab-btn primary">
+          <i className="fa-solid fa-star"></i> Feedback
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {showPaymentModal && <PaymentModal restaurant={restaurant} onClose={() => setShowPaymentModal(false)} />}
+        {showFeedbackModal && <FeedbackModal restaurant={restaurant} onClose={() => setShowFeedbackModal(false)} />}
+        {selectedItem && <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+      </AnimatePresence>
       
       <Footer restaurant={restaurant} />
     </div>
