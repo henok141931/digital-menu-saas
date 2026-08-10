@@ -23,7 +23,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('userRole');
+    const userRole = localStorage.getItem('role');
 
     if (!token) {
       navigate('/login');
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
+    localStorage.removeItem('role');
     localStorage.removeItem('restaurantId');
     navigate('/login');
   };
