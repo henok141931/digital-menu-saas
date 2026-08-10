@@ -27,6 +27,7 @@ function AdminPanel() {
   const [newItemDesc, setNewItemDesc] = useState('');
   const [newItemPrice, setNewItemPrice] = useState('');
   const [newItemImage, setNewItemImage] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
   const [newItemCatId, setNewItemCatId] = useState('');
   const [newItemDietary, setNewItemDietary] = useState([]);
   const [isItemSubmitting, setIsItemSubmitting] = useState(false);
@@ -255,6 +256,37 @@ function AdminPanel() {
         }
       }
     });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'QR Menu');
+      
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+      if (!cloudName) {
+        throw new Error("VITE_CLOUDINARY_CLOUD_NAME is missing in .env!");
+      }
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) throw new Error('Image upload failed');
+      const data = await res.json();
+      setNewItemImage(data.secure_url);
+      showToast('Image uploaded successfully!');
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleAddItem = async (e) => {
@@ -754,13 +786,23 @@ function AdminPanel() {
               className="admin-input"
             />
             
-            <input 
-              type="url" 
-              placeholder="Image URL (Optional)" 
-              value={newItemImage}
-              onChange={(e) => setNewItemImage(e.target.value)}
-              className="admin-input"
-            />
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }}>
+              <label style={{ fontSize: '14px', color: 'var(--text-main)' }}>Menu Item Image (Optional)</label>
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={isUploading}
+                style={{ color: 'var(--text-main)', fontSize: '14px' }}
+              />
+              {isUploading && <span style={{ fontSize: '13px', color: 'var(--primary)' }}>Uploading image to Cloudinary...</span>}
+              {newItemImage && (
+                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <img src={newItemImage} alt="Preview" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--glass-border)' }} />
+                  <button type="button" onClick={() => setNewItemImage('')} style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '13px', padding: '4px 0', marginTop: '4px' }}>Remove Image</button>
+                </div>
+              )}
+            </div>
 
             <select 
               value={newItemCatId} 

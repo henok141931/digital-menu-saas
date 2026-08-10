@@ -6,6 +6,7 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
   const [categoryId, setCategoryId] = useState('');
   const [dietaryTags, setDietaryTags] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,6 +21,36 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
       setDietaryTags(item.dietaryTags || []);
     }
   }, [item]);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'QR Menu');
+      
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+      if (!cloudName) {
+        throw new Error("VITE_CLOUDINARY_CLOUD_NAME is missing in .env!");
+      }
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) throw new Error('Image upload failed');
+      const data = await res.json();
+      setImageUrl(data.secure_url);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,15 +131,21 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
               />
             </div>
             <div style={{ flex: 2 }}>
-              <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Image URL</label>
+              <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Menu Item Image (Optional)</label>
               <input 
-                type="url" 
-                value={imageUrl}
-                onChange={e => setImageUrl(e.target.value)}
-                className="admin-input" 
-                style={{ width: '100%' }}
-                placeholder="https://example.com/image.jpg"
+                type="file" 
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={isUploading}
+                style={{ color: 'var(--text-main)', fontSize: '14px' }}
               />
+              {isUploading && <span style={{ fontSize: '13px', color: 'var(--primary)', display: 'block', marginTop: '4px' }}>Uploading image to Cloudinary...</span>}
+              {imageUrl && (
+                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <img src={imageUrl} alt="Preview" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--glass-border)' }} />
+                  <button type="button" onClick={() => setImageUrl('')} style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '13px', padding: '4px 0', marginTop: '4px' }}>Remove Image</button>
+                </div>
+              )}
             </div>
           </div>
 
