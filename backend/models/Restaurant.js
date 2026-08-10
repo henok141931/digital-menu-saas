@@ -11,6 +11,10 @@ const restaurantSchema = new mongoose.Schema(
       type: String,
       default: '#3b82f6', // Default blue
     },
+    coverImageUrl: {
+      type: String,
+      default: '',
+    },
     secondaryColor: {
       type: String,
       default: '#1e40af', // Default darker blue

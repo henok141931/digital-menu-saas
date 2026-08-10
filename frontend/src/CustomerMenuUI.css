@@ -1,32 +1,56 @@
 /* Additions for Premium Customer Menu UI */
 
-/* Minimalist Hero Header */
+/* UberEats Cover Image Hero */
 .customer-hero {
-  padding: 48px 24px 32px;
-  background: var(--bg-card, #ffffff);
-  text-align: center;
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
-  margin-bottom: 24px;
+  position: relative;
+  height: 30vh;
+  min-height: 200px;
+  max-height: 300px;
+  background-color: var(--bg-card, #ffffff);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-bottom: 60px; /* Space for overlapping card */
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
 }
 
 .hero-content {
-  max-width: 600px;
-  margin: 0 auto;
+  position: absolute;
+  bottom: -40px;
+  left: 24px;
+  right: 24px;
+  background: var(--bg-card, #ffffff);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  z-index: 10;
 }
 
 .hero-content h1 {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 800;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
   color: var(--text-main);
+  line-height: 1.2;
 }
 
 .hero-content p {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--text-muted);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.4;
+  margin: 0;
 }
 
 /* Snap-Scroll Category Navigation */

@@ -51,7 +51,7 @@ export const getRestaurantBySlug = async (req, res) => {
 export const updateRestaurantSettings = async (req, res) => {
   try {
     const { id } = req.params;
-    const { brandColor, secondaryColor, paymentMethods, contactPhone, contactEmail, socialLinks } = req.body;
+    const { brandColor, secondaryColor, coverImageUrl, paymentMethods, contactPhone, contactEmail, socialLinks } = req.body;
 
     if (id !== req.user.restaurantId.toString()) {
       return res.status(403).json({ message: 'Not authorized to update this restaurant' });
@@ -59,7 +59,7 @@ export const updateRestaurantSettings = async (req, res) => {
 
     const restaurant = await Restaurant.findByIdAndUpdate(
       id,
-      { brandColor, secondaryColor, paymentMethods, contactPhone, contactEmail, socialLinks },
+      { brandColor, secondaryColor, coverImageUrl, paymentMethods, contactPhone, contactEmail, socialLinks },
       { new: true }
     );
 

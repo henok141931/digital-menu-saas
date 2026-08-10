@@ -122,12 +122,18 @@ function CustomerMenu() {
     <>
       <div className="menu-container" style={{ paddingBottom: '100px' }}>
         <div className="animate-slide-up">
-          <header className="customer-hero">
-        <div className="hero-content">
-          <h1>{restaurant.name}</h1>
-          <p>{restaurant.description || 'Welcome to our menu'}</p>
-        </div>
-      </header>
+          <header 
+            className="customer-hero"
+            style={{ 
+              backgroundImage: restaurant.coverImageUrl ? `url(${restaurant.coverImageUrl})` : `linear-gradient(135deg, var(--brand-color) 0%, var(--secondary-color, #1e40af) 100%)`
+            }}
+          >
+            {restaurant.coverImageUrl && <div className="hero-overlay"></div>}
+            <div className="hero-content">
+              <h1>{restaurant.name}</h1>
+              <p>{restaurant.description || 'Welcome to our menu'}</p>
+            </div>
+          </header>
 
       <div className="search-container">
         <input 

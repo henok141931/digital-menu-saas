@@ -6,6 +6,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
   // Local state for forms
   const [brandColor, setBrandColor] = useState(restaurant?.brandColor || '#3b82f6');
   const [secondaryColor, setSecondaryColor] = useState(restaurant?.secondaryColor || '#1e40af');
+  const [coverImageUrl, setCoverImageUrl] = useState(restaurant?.coverImageUrl || '');
   const [isColorSubmitting, setIsColorSubmitting] = useState(false);
 
   const [paymentMethods, setPaymentMethods] = useState(restaurant?.paymentMethods || []);
@@ -44,7 +45,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
 
   const handleColorUpdate = (e) => {
     e.preventDefault();
-    handleUpdateSection('Branding', { brandColor, secondaryColor }, setIsColorSubmitting);
+    handleUpdateSection('Branding', { brandColor, secondaryColor, coverImageUrl }, setIsColorSubmitting);
   };
 
   const handlePaymentUpdate = (e) => {
@@ -100,6 +101,12 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
                 <label className="admin-label">Secondary Color</label>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Used for accents and gradients</div>
               </div>
+            </div>
+
+            <div>
+              <label className="admin-label">Cover Image URL</label>
+              <input type="url" value={coverImageUrl} onChange={e => setCoverImageUrl(e.target.value)} className="admin-input" placeholder="https://example.com/image.jpg" />
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Displays at the top of the customer menu</div>
             </div>
 
             <button type="submit" disabled={isColorSubmitting} className="add-btn primary" style={{ marginTop: '8px' }}>
