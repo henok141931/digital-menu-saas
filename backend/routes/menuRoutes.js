@@ -9,7 +9,8 @@ import {
   updateMenuItem,
   bulkUploadMenu,
   createDietaryTag,
-  deleteDietaryTag
+  deleteDietaryTag,
+  bulkDeleteMenuItems
 } from '../controllers/menuController.js';
 import { protect, authorize, tenantScope } from '../middleware/authMiddleware.js';
 
@@ -35,6 +36,9 @@ router.post('/items', protect, authorize('SUPER_ADMIN', 'ADMIN'), tenantScope, c
 
 // POST /api/menu/bulk -> Bulk uploads menu items (Admin only)
 router.post('/bulk', protect, authorize('SUPER_ADMIN', 'ADMIN'), tenantScope, bulkUploadMenu);
+
+// POST /api/menu/items/bulk-delete -> Bulk deletes menu items (Admin only)
+router.post('/items/bulk-delete', protect, authorize('SUPER_ADMIN', 'ADMIN'), tenantScope, bulkDeleteMenuItems);
 
 // DELETE /api/menu/items/:id -> Deletes a menu item (Admin only)
 router.delete('/items/:id', protect, authorize('SUPER_ADMIN', 'ADMIN'), deleteMenuItem);

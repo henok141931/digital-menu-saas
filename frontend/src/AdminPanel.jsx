@@ -33,6 +33,10 @@ function AdminPanel() {
   
   const [editingItem, setEditingItem] = useState(null);
 
+  // Bulk Action State
+  const [selectedItemIds, setSelectedItemIds] = useState([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
   // Settings State
   const [brandColor, setBrandColor] = useState('#3b82f6');
   const [secondaryColor, setSecondaryColor] = useState('#1e40af');
@@ -357,6 +361,52 @@ function AdminPanel() {
           showToast('Item deleted successfully');
         } catch (err) {
           showToast(err.message, 'error');
+        }
+      }
+    });
+  };
+
+  const handleSelectItem = (itemId) => {
+    setSelectedItemIds(prev => 
+      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
+    );
+  };
+
+  const handleSelectCategory = (categoryId, isSelected) => {
+    const categoryItemIds = menuData.items.filter(item => item.categoryId === categoryId).map(item => item._id);
+    if (isSelected) {
+      setSelectedItemIds(prev => [...new Set([...prev, ...categoryItemIds])]);
+    } else {
+      setSelectedItemIds(prev => prev.filter(id => !categoryItemIds.includes(id)));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    setConfirmDialog({
+      isOpen: true,
+      title: `Delete ${selectedItemIds.length} Items`,
+      message: `Are you sure you want to permanently delete these ${selectedItemIds.length} menu items?`,
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        setIsBulkDeleting(true);
+        try {
+          const res = await fetch(`${BASE_URL}/api/menu/items/bulk-delete`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ itemIds: selectedItemIds })
+          });
+          if (!res.ok) throw new Error('Failed to delete items');
+          const data = await res.json();
+          setSelectedItemIds([]);
+          await fetchMenu();
+          showToast(data.message || 'Items deleted successfully');
+        } catch (err) {
+          showToast(err.message, 'error');
+        } finally {
+          setIsBulkDeleting(false);
         }
       }
     });
@@ -771,7 +821,19 @@ function AdminPanel() {
           {menuData.categories.map(cat => (
             <div key={cat._id} className="glass-panel" style={{ marginBottom: '24px', padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--glass-border)' }}>
-                <h3 style={{ margin: 0, fontSize: '20px' }}>{cat.name}</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <input 
+                    type="checkbox" 
+                    onChange={(e) => handleSelectCategory(cat._id, e.target.checked)}
+                    checked={
+                      menuData.items.filter(item => item.categoryId === cat._id).length > 0 && 
+                      menuData.items.filter(item => item.categoryId === cat._id).every(item => selectedItemIds.includes(item._id))
+                    }
+                    style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                    title="Select all items in this category"
+                  />
+                  <h3 style={{ margin: 0, fontSize: '20px' }}>{cat.name}</h3>
+                </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button onClick={() => handleEditCategory(cat._id, cat.name)} className="add-btn" style={{ fontSize: '14px', padding: '6px 12px', background: 'transparent', border: '1px solid var(--text-muted)' }}>Edit</button>
                   <button onClick={() => handleDeleteCategory(cat._id)} className="add-btn danger" style={{ fontSize: '14px', padding: '6px 12px' }}>Delete</button>
@@ -781,9 +843,17 @@ function AdminPanel() {
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {menuData.items.filter(item => item.categoryId === cat._id).map(item => (
                   <li key={item._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                    <div>
-                      <strong style={{ display: 'block', color: 'var(--text-main)' }}>{item.name}</strong>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>{item.price} ETB</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedItemIds.includes(item._id)}
+                        onChange={() => handleSelectItem(item._id)}
+                        style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                      />
+                      <div>
+                        <strong style={{ display: 'block', color: 'var(--text-main)' }}>{item.name}</strong>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>{item.price} ETB</span>
+                      </div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button onClick={() => setEditingItem(item)} className="add-btn" style={{ fontSize: '13px', padding: '4px 8px', borderRadius: '6px', background: 'transparent', border: '1px solid var(--text-muted)' }}>Edit</button>
@@ -833,6 +903,47 @@ function AdminPanel() {
 
       </div>
       
+      {/* BULK ACTIONS BAR */}
+      {selectedItemIds.length > 0 && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(30, 41, 59, 0.95)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: '16px',
+          padding: '16px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '24px',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+          zIndex: 1000,
+          color: '#fff'
+        }}>
+          <div style={{ fontWeight: '600' }}>
+            {selectedItemIds.length} item{selectedItemIds.length !== 1 ? 's' : ''} selected
+          </div>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button 
+              onClick={() => setSelectedItemIds([])}
+              className="add-btn" 
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#fff' }}
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleBulkDelete}
+              className="add-btn danger"
+              disabled={isBulkDeleting}
+            >
+              {isBulkDeleting ? 'Deleting...' : 'Delete Selected'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {editingItem && (
         <EditItemModal 
           item={editingItem}

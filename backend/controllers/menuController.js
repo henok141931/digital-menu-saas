@@ -294,3 +294,28 @@ export const bulkUploadMenu = async (req, res) => {
     res.status(500).json({ message: 'Server Error: ' + error.message });
   }
 };
+
+// @desc    Bulk delete menu items
+// @route   POST /api/menu/items/bulk-delete
+export const bulkDeleteMenuItems = async (req, res) => {
+  try {
+    const { itemIds } = req.body;
+    const restaurantId = req.user.restaurantId;
+
+    if (!itemIds || !Array.isArray(itemIds) || itemIds.length === 0) {
+      return res.status(400).json({ message: 'No item IDs provided' });
+    }
+
+    const result = await MenuItem.deleteMany({
+      _id: { $in: itemIds },
+      restaurantId
+    });
+
+    res.status(200).json({ 
+      message: `Successfully deleted ${result.deletedCount} items.`,
+      deletedCount: result.deletedCount
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: ' + error.message });
+  }
+};
