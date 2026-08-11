@@ -27,7 +27,10 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
         },
         body: JSON.stringify({ restaurantId, name: newCatName })
       });
-      if (!res.ok) throw new Error('Failed to add category');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to add category');
+      }
       setNewCatName('');
       Toast.success('Category added');
       refreshMenu();
@@ -42,11 +45,14 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
     if (!deleteItem || deleteItem.type !== 'category') return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${BASE_URL}/api/menu/category/${deleteItem.id}`, {
+      const res = await fetch(`${BASE_URL}/api/menu/categories/${deleteItem.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to delete category');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to delete category');
+      }
       Toast.success('Category deleted');
       setDeleteItem(null);
       refreshMenu();
@@ -70,7 +76,10 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
         },
         body: JSON.stringify({ restaurantId, name: newTagName })
       });
-      if (!res.ok) throw new Error('Failed to add tag');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to add tag');
+      }
       setNewTagName('');
       Toast.success('Tag added');
       refreshMenu();
@@ -89,7 +98,10 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to delete tag');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to delete tag');
+      }
       Toast.success('Tag deleted');
       setDeleteItem(null);
       refreshMenu();

@@ -66,7 +66,7 @@ export default function MenuTab({ menuData, refreshMenu }) {
     try {
       const token = localStorage.getItem('token');
       const restaurantId = localStorage.getItem('restaurantId');
-      const res = await fetch(`${BASE_URL}/api/menu/${restaurantId}/bulk-delete`, {
+      const res = await fetch(`${BASE_URL}/api/menu/items/bulk-delete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -90,9 +90,10 @@ export default function MenuTab({ menuData, refreshMenu }) {
     if (!itemToDelete) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${BASE_URL}/api/menu/item/${itemToDelete._id}`, {
+      const res = await fetch(`${BASE_URL}/api/menu/items/${itemToDelete._id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to delete item');
       Toast.success('Item deleted');
@@ -122,7 +123,7 @@ export default function MenuTab({ menuData, refreshMenu }) {
         imageUrl: newItemImage
       };
 
-      const res = await fetch(`${BASE_URL}/api/menu/item`, {
+      const res = await fetch(`${BASE_URL}/api/menu/items`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

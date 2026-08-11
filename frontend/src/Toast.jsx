@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createRoot } from 'react-dom/client';
 import './App.css';
 
 function Toast({ message, type = 'success', onClose }) {
@@ -47,5 +48,27 @@ function Toast({ message, type = 'success', onClose }) {
     </div>
   );
 }
+let toastRoot = null;
+
+Toast.show = (message, type = 'success') => {
+  if (typeof document === 'undefined') return;
+  const containerId = 'toast-container-global';
+  let container = document.getElementById(containerId);
+  if (!container) {
+    container = document.createElement('div');
+    container.id = containerId;
+    document.body.appendChild(container);
+    toastRoot = createRoot(container);
+  }
+  
+  toastRoot.render(
+    <Toast message={message} type={type} onClose={() => {
+      if (toastRoot) toastRoot.render(null);
+    }} />
+  );
+};
+
+Toast.success = (message) => Toast.show(message, 'success');
+Toast.error = (message) => Toast.show(message, 'error');
 
 export default Toast;

@@ -70,7 +70,7 @@ export const deleteCategory = async (req, res) => {
       return res.status(404).json({ message: 'Category not found' });
     }
 
-    if (category.restaurantId.toString() !== req.user.restaurantId.toString()) {
+    if (req.user.role !== 'SUPER_ADMIN' && category.restaurantId.toString() !== req.user.restaurantId.toString()) {
       return res.status(403).json({ message: 'Not authorized to delete this category' });
     }
 
@@ -94,7 +94,7 @@ export const deleteMenuItem = async (req, res) => {
       return res.status(404).json({ message: 'Menu item not found' });
     }
 
-    if (item.restaurantId.toString() !== req.user.restaurantId.toString()) {
+    if (req.user.role !== 'SUPER_ADMIN' && item.restaurantId.toString() !== req.user.restaurantId.toString()) {
       return res.status(403).json({ message: 'Not authorized to delete this item' });
     }
 
@@ -189,15 +189,24 @@ export const createDietaryTag = async (req, res) => {
 export const deleteDietaryTag = async (req, res) => {
   try {
     const { id } = req.params;
-    const tag = await DietaryTag.findOneAndDelete({ _id: id, restaurantId: req.user.restaurantId });
+    const query = { _id: id };
+    if (req.user.role !== 'SUPER_ADMIN') {
+      query.restaurantId = req.user.restaurantId;
+    }
+    const tag = await DietaryTag.findOneAndDelete(query);
     
     if (!tag) {
       return res.status(404).json({ message: 'Tag not found' });
     }
 
+    const updateQuery = {};
+    if (req.user.role !== 'SUPER_ADMIN') {
+      updateQuery.restaurantId = req.user.restaurantId;
+    }
+    
     // Remove this tag string from all menu items in this restaurant
     await MenuItem.updateMany(
-      { restaurantId: req.user.restaurantId },
+      updateQuery,
       { $pull: { dietaryTags: tag.name } }
     );
 

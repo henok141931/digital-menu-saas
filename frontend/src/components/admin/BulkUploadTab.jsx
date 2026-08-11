@@ -75,7 +75,7 @@ export default function BulkUploadTab({ refreshMenu }) {
       const token = localStorage.getItem('token');
       const restaurantId = localStorage.getItem('restaurantId');
       
-      const res = await fetch(`${BASE_URL}/api/menu/bulk-upload`, {
+      const res = await fetch(`${BASE_URL}/api/menu/bulk`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
