@@ -32,7 +32,7 @@ export default function MenuTab({ menuData, refreshMenu }) {
   const filteredCategories = useMemo(() => {
     return menuData.categories.map(cat => {
       const items = menuData.items.filter(item => {
-        const matchesCat = item.category === cat._id;
+        const matchesCat = item.categoryId === cat._id;
         const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesTag = filterTag === 'All' || (item.dietaryTags && item.dietaryTags.includes(filterTag));
         return matchesCat && matchesSearch && matchesTag;
@@ -390,6 +390,7 @@ export default function MenuTab({ menuData, refreshMenu }) {
       {/* Delete Confirmation */}
       {itemToDelete && (
         <ConfirmModal 
+          isOpen={true}
           message={`Are you sure you want to delete ${itemToDelete.name}?`} 
           onConfirm={handleDeleteItem} 
           onCancel={() => setItemToDelete(null)} 

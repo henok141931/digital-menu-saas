@@ -3,7 +3,8 @@ import {
   createRestaurant,
   getRestaurantBySlug,
   updateRestaurantSettings,
-  getAllRestaurants
+  getAllRestaurants,
+  deleteRestaurant
 } from '../controllers/restaurantController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -31,5 +32,8 @@ router.get('/id/:id', async (req, res) => {
 
 // PUT /api/restaurants/:id -> Updates settings (Admin only)
 router.put('/:id', protect, authorize('SUPER_ADMIN', 'ADMIN'), updateRestaurantSettings);
+
+// DELETE /api/restaurants/:id -> Deletes a restaurant (SUPER_ADMIN only)
+router.delete('/:id', protect, authorize('SUPER_ADMIN'), deleteRestaurant);
 
 export default router;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BASE_URL } from '../../config';
 import Toast from '../../Toast';
+import ConfirmModal from '../../ConfirmModal';
 
 export default function SuperAdminAccountsTab({ restaurants }) {
   const [users, setUsers] = useState([]);
@@ -10,6 +11,7 @@ export default function SuperAdminAccountsTab({ restaurants }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   
   // Form State
   const [username, setUsername] = useState('');
@@ -100,15 +102,16 @@ export default function SuperAdminAccountsTab({ restaurants }) {
     }
   };
 
-  const handleDelete = async (userId) => {
-    if (!window.confirm('Are you sure you want to delete this account?')) return;
+  const handleDelete = async () => {
+    if (!deleteId) return;
     try {
-      const res = await fetch(`${BASE_URL}/api/users/${userId}`, {
+      const res = await fetch(`${BASE_URL}/api/users/${deleteId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error(await res.json().then(d => d.message));
       showToast('Account deleted successfully!');
+      setDeleteId(null);
       fetchUsers();
     } catch (err) {
       showToast(err.message, 'error');
@@ -143,7 +146,7 @@ export default function SuperAdminAccountsTab({ restaurants }) {
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={() => openModal(user)} className="add-btn" style={{ background: '#e2e8f0', color: 'var(--text-main)', border: 'none' }}>Edit</button>
                 {user.role !== 'SUPER_ADMIN' && (
-                  <button onClick={() => handleDelete(user._id)} className="add-btn danger" style={{ border: 'none' }}>Delete</button>
+                  <button onClick={() => setDeleteId(user._id)} className="add-btn danger" style={{ border: 'none' }}>Delete</button>
                 )}
               </div>
             </div>
@@ -171,7 +174,7 @@ export default function SuperAdminAccountsTab({ restaurants }) {
                 <label className="admin-label">Role</label>
                 <select value={role} onChange={(e) => setRole(e.target.value)} className="admin-input">
                   <option value="ADMIN">Admin</option>
-                  <option value="WAITER">Waiter</option>
+
                   <option value="SUPER_ADMIN">Super Admin</option>
                 </select>
               </div>
@@ -196,6 +199,14 @@ export default function SuperAdminAccountsTab({ restaurants }) {
       )}
 
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: '', type: 'success' })} />
+      {deleteId && (
+        <ConfirmModal 
+          isOpen={true}
+          message="Are you sure you want to delete this account? They will lose access immediately."
+          onConfirm={handleDelete}
+          onCancel={() => setDeleteId(null)}
+        />
+      )}
     </div>
   );
 }

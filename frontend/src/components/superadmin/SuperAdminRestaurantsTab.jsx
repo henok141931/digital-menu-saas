@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BASE_URL } from '../../config';
 import Toast from '../../Toast';
+import ConfirmModal from '../../ConfirmModal';
 
 export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants }) {
   const [newRestName, setNewRestName] = useState('');
@@ -10,6 +11,7 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
   const [adminPassword, setAdminPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const [toast, setToast] = useState({ message: '', type: 'success' });
   const showToast = (message, type = 'success') => setToast({ message, type });
@@ -74,6 +76,25 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
       showToast(err.message, 'error');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteRestaurant = async () => {
+    if (!deleteId) return;
+    try {
+      const res = await fetch(`${BASE_URL}/api/restaurants/${deleteId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to delete restaurant');
+      }
+      Toast.success('Restaurant deleted successfully');
+      setDeleteId(null);
+      fetchRestaurants();
+    } catch (err) {
+      Toast.error(err.message);
     }
   };
 
@@ -157,13 +178,22 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
                   </p>
                 </div>
                 
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-main)' }}>
-                    {rest.viewCount || 0}
+                <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '24px' }}>
+                  <div>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-main)' }}>
+                      {rest.viewCount || 0}
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                      Total Scans
+                    </div>
                   </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    Total Scans
-                  </div>
+                  <button 
+                    onClick={() => setDeleteId(rest._id)} 
+                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px', fontSize: '18px' }}
+                    title="Delete Restaurant"
+                  >
+                    🗑️
+                  </button>
                 </div>
               </div>
             ))}
@@ -178,6 +208,14 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
         type={toast.type} 
         onClose={() => setToast({ message: '', type: 'success' })} 
       />
+      {deleteId && (
+        <ConfirmModal 
+          isOpen={true}
+          message="Are you sure you want to delete this restaurant and ALL of its associated accounts, menus, and feedback? This action cannot be undone."
+          onConfirm={handleDeleteRestaurant}
+          onCancel={() => setDeleteId(null)}
+        />
+      )}
     </div>
   );
 }

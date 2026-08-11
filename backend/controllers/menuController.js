@@ -119,7 +119,7 @@ export const updateCategory = async (req, res) => {
       return res.status(404).json({ message: 'Category not found' });
     }
 
-    if (category.restaurantId.toString() !== req.user.restaurantId.toString()) {
+    if (req.user.role !== 'SUPER_ADMIN' && category.restaurantId.toString() !== req.user.restaurantId.toString()) {
       return res.status(403).json({ message: 'Not authorized to update this category' });
     }
 
@@ -147,7 +147,7 @@ export const updateMenuItem = async (req, res) => {
       return res.status(404).json({ message: 'Menu item not found' });
     }
 
-    if (item.restaurantId.toString() !== req.user.restaurantId.toString()) {
+    if (req.user.role !== 'SUPER_ADMIN' && item.restaurantId.toString() !== req.user.restaurantId.toString()) {
       return res.status(403).json({ message: 'Not authorized to update this item' });
     }
 
@@ -216,6 +216,47 @@ export const deleteDietaryTag = async (req, res) => {
   }
 };
 
+// @desc    Update a dietary tag
+// @route   PUT /api/menu/tags/:id
+export const updateDietaryTag = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    const query = { _id: id };
+    if (req.user.role !== 'SUPER_ADMIN') {
+      query.restaurantId = req.user.restaurantId;
+    }
+    const tag = await DietaryTag.findOne(query);
+
+    if (!tag) {
+      return res.status(404).json({ message: 'Tag not found' });
+    }
+
+    const oldName = tag.name;
+    tag.name = name || tag.name;
+    const updatedTag = await tag.save();
+
+    if (oldName !== updatedTag.name) {
+      const updateQuery = {};
+      if (req.user.role !== 'SUPER_ADMIN') {
+        updateQuery.restaurantId = req.user.restaurantId;
+      }
+      
+      // Update this tag string in all menu items that used the old tag name
+      await MenuItem.updateMany(
+        updateQuery,
+        { $set: { "dietaryTags.$[elem]": updatedTag.name } },
+        { arrayFilters: [{ "elem": oldName }] }
+      );
+    }
+
+    res.status(200).json(updatedTag);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: ' + error.message });
+  }
+};
+
 // @desc    Bulk upload menu items from CSV
 // @route   POST /api/menu/bulk
 export const bulkUploadMenu = async (req, res) => {
@@ -229,13 +270,27 @@ export const bulkUploadMenu = async (req, res) => {
 
     let itemsCreated = 0;
     let categoriesCreated = 0;
+    const errors = [];
 
     // Cache to prevent duplicate creations in the same loop
     const categoryCache = {};
     const tagCache = {};
 
-    for (const row of items) {
-      if (!row.category || !row.itemname) continue; // Skip invalid rows
+    let index = 0;
+    for (const rawRow of items) {
+      // Normalize keys to lowercase to avoid case-sensitivity issues
+      const row = Object.keys(rawRow).reduce((acc, key) => {
+        acc[key.trim().toLowerCase()] = rawRow[key];
+        return acc;
+      }, {});
+      
+      const rowNum = index + 1; // 1-based index for humans
+      index++;
+
+      if (!row.category || !row.itemname) {
+        errors.push(`Row ${rowNum}: Missing 'Category' or 'ItemName'`);
+        continue; // Skip invalid rows
+      }
 
       let categoryId;
       const categoryName = row.category.trim();
@@ -281,23 +336,29 @@ export const bulkUploadMenu = async (req, res) => {
       }
 
       // Create item
-      await MenuItem.create({
-        restaurantId,
-        categoryId,
-        name: row.itemname.trim(),
-        description: row.description ? row.description.trim() : '',
-        price: parsedPrice,
-        dietaryTags: parsedTags,
-        sortOrder: itemsCreated,
-        imageUrl: null
-      });
-      itemsCreated++;
-    }
+      try {
+        await MenuItem.create({
+          restaurantId,
+          categoryId,
+          name: row.itemname.trim(),
+          description: row.description ? row.description.trim() : '',
+          price: parsedPrice,
+          dietaryTags: parsedTags,
+          sortOrder: itemsCreated,
+          imageUrl: null
+        });
+        itemsCreated++;
+      } catch (err) {
+        errors.push(`Row ${rowNum}: Failed to create item '${row.itemname}' - ${err.message}`);
+      }
+    } // end for loop
 
     res.status(201).json({ 
-      message: `Bulk upload successful. Created ${categoriesCreated} new categories and ${itemsCreated} items.`,
+      success: true,
+      message: `Bulk upload processed. Created ${categoriesCreated} new categories and ${itemsCreated} items.`,
       categoriesCreated,
-      itemsCreated
+      itemsCreated,
+      errors
     });
   } catch (error) {
     res.status(500).json({ message: 'Server Error: ' + error.message });

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BASE_URL } from '../../config';
 import Toast from '../../Toast';
 import ConfirmModal from '../../ConfirmModal';
+import PromptModal from '../../PromptModal';
 
 export default function TaxonomyTab({ menuData, refreshMenu }) {
   const [newCatName, setNewCatName] = useState('');
@@ -11,6 +12,7 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
   const [isTagSubmitting, setIsTagSubmitting] = useState(false);
 
   const [deleteItem, setDeleteItem] = useState(null); // { type: 'category' | 'tag', id: string, name: string }
+  const [editItem, setEditItem] = useState(null); // { type: 'category' | 'tag', id: string, name: string }
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
@@ -115,6 +117,34 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
     if (deleteItem.type === 'tag') handleDeleteTag();
   };
 
+  const handleEditConfirm = async (newName) => {
+    if (!editItem || !newName.trim()) return;
+    try {
+      const token = localStorage.getItem('token');
+      const endpoint = editItem.type === 'category' ? `/api/menu/categories/${editItem.id}` : `/api/menu/tags/${editItem.id}`;
+      
+      const res = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: newName })
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || `Failed to update ${editItem.type}`);
+      }
+      
+      Toast.success(`${editItem.type === 'category' ? 'Category' : 'Tag'} updated`);
+      setEditItem(null);
+      refreshMenu();
+    } catch (err) {
+      Toast.error(err.message);
+    }
+  };
+
   return (
     <div className="tab-pane">
       <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px' }}>Categories & Tags</h2>
@@ -143,13 +173,22 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
             {menuData.categories.length > 0 ? menuData.categories.map(cat => (
               <div key={cat._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                 <span style={{ fontWeight: '500' }}>{cat.name}</span>
-                <button 
-                  onClick={() => setDeleteItem({ type: 'category', id: cat._id, name: cat.name })} 
-                  style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
-                  title="Delete Category"
-                >
-                  🗑️
-                </button>
+                <div>
+                  <button 
+                    onClick={() => setEditItem({ type: 'category', id: cat._id, name: cat.name })} 
+                    style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '4px', marginRight: '8px' }}
+                    title="Edit Category"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    onClick={() => setDeleteItem({ type: 'category', id: cat._id, name: cat.name })} 
+                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                    title="Delete Category"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             )) : (
               <p style={{ color: 'var(--text-muted)' }}>No categories created yet.</p>
@@ -181,13 +220,22 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
                 <span className={`dietary-tag ${tag.name.toLowerCase().replace(' ', '-')}`}>
                   {tag.name}
                 </span>
-                <button 
-                  onClick={() => setDeleteItem({ type: 'tag', id: tag._id, name: tag.name })} 
-                  style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
-                  title="Delete Tag"
-                >
-                  🗑️
-                </button>
+                <div>
+                  <button 
+                    onClick={() => setEditItem({ type: 'tag', id: tag._id, name: tag.name })} 
+                    style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '4px', marginRight: '8px' }}
+                    title="Edit Tag"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    onClick={() => setDeleteItem({ type: 'tag', id: tag._id, name: tag.name })} 
+                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                    title="Delete Tag"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             )) : (
               <p style={{ color: 'var(--text-muted)' }}>No dietary tags created yet.</p>
@@ -199,11 +247,21 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
 
       {deleteItem && (
         <ConfirmModal 
+          isOpen={true}
           message={`Are you sure you want to delete the ${deleteItem.type} "${deleteItem.name}"? This action cannot be undone.`} 
           onConfirm={confirmDelete} 
           onCancel={() => setDeleteItem(null)} 
         />
       )}
+
+      <PromptModal
+        isOpen={!!editItem}
+        title={`Edit ${editItem?.type === 'category' ? 'Category' : 'Tag'}`}
+        initialValue={editItem?.name}
+        placeholder="Enter new name"
+        onConfirm={handleEditConfirm}
+        onCancel={() => setEditItem(null)}
+      />
     </div>
   );
 }

@@ -6,9 +6,10 @@ import Toast from '../../Toast';
 export default function BulkUploadTab({ refreshMenu }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploadingCSV, setIsUploadingCSV] = useState(false);
+  const [uploadHistory, setUploadHistory] = useState([]);
 
   const handleDownloadTemplate = () => {
-    const csvContent = "data:text/csv;charset=utf-8,Category,ItemName,Description,Price,DietaryTags\nStarters,Garlic Bread,Crispy bread with garlic butter,5.99,Fasting\nMains,Margherita Pizza,Classic cheese and tomato pizza,12.99,Fasting\nMains,Chicken Wings,Spicy buffalo wings,8.99,Non-Fasting";
+    const csvContent = "data:text/csv;charset=utf-8,category,itemname,description,price,dietarytags\nStarters,Garlic Bread,Crispy bread with garlic butter,5.99,Fasting\nMains,Margherita Pizza,Classic cheese and tomato pizza,12.99,Fasting\nMains,Chicken Wings,Spicy buffalo wings,8.99,Non-Fasting";
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -90,10 +91,41 @@ export default function BulkUploadTab({ refreshMenu }) {
       }
       
       const result = await res.json();
-      Toast.success(`Successfully uploaded ${result.count} items!`);
+      
+      const newHistoryItem = {
+        id: Date.now(),
+        filename: 'menu_upload.csv', // Fallback, could pass actual filename if desired
+        time: new Date().toLocaleTimeString(),
+        status: result.errors && result.errors.length > 0 ? (result.itemsCreated > 0 ? 'Partial' : 'Failed') : 'Success',
+        created: result.itemsCreated || 0,
+        errors: result.errors || []
+      };
+
+      setUploadHistory(prev => [newHistoryItem, ...prev]);
+
+      if (result.errors && result.errors.length > 0) {
+        if (result.itemsCreated > 0) {
+          Toast.success(`Uploaded ${result.itemsCreated} items, but there were some errors.`);
+        } else {
+          Toast.error(`Upload failed. See history for details.`);
+        }
+      } else {
+        Toast.success(`Successfully uploaded ${result.itemsCreated} items!`);
+      }
+
       refreshMenu();
     } catch (err) {
       Toast.error(err.message);
+      
+      setUploadHistory(prev => [{
+        id: Date.now(),
+        filename: 'menu_upload.csv',
+        time: new Date().toLocaleTimeString(),
+        status: 'Failed',
+        created: 0,
+        errors: [err.message]
+      }, ...prev]);
+
     } finally {
       setIsUploadingCSV(false);
     }
@@ -140,14 +172,62 @@ export default function BulkUploadTab({ refreshMenu }) {
         </button>
       </div>
 
+      {uploadHistory.length > 0 && (
+        <div style={{ marginTop: '32px' }} className="glass-panel animate-slide-up">
+          <h3 style={{ padding: '24px 24px 0', marginBottom: '16px' }}>Session Upload History</h3>
+          <div style={{ padding: '0 24px 24px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
+                  <th style={{ padding: '12px 0' }}>Time</th>
+                  <th style={{ padding: '12px 0' }}>Status</th>
+                  <th style={{ padding: '12px 0' }}>Items Created</th>
+                  <th style={{ padding: '12px 0' }}>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {uploadHistory.map(entry => (
+                  <React.Fragment key={entry.id}>
+                    <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <td style={{ padding: '12px 0', verticalAlign: 'top' }}>{entry.time}</td>
+                      <td style={{ padding: '12px 0', verticalAlign: 'top' }}>
+                        <span style={{ 
+                          padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold',
+                          background: entry.status === 'Success' ? '#dcfce7' : entry.status === 'Failed' ? '#fee2e2' : '#fef08a',
+                          color: entry.status === 'Success' ? '#166534' : entry.status === 'Failed' ? '#991b1b' : '#854d0e'
+                        }}>
+                          {entry.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px 0', verticalAlign: 'top' }}>{entry.created}</td>
+                      <td style={{ padding: '12px 0', verticalAlign: 'top' }}>
+                        {entry.errors.length > 0 ? (
+                          <ul style={{ margin: 0, paddingLeft: '16px', color: '#ef4444', fontSize: '14px' }}>
+                            {entry.errors.map((err, i) => (
+                              <li key={i}>{err}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>No errors</span>
+                        )}
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div style={{ marginTop: '32px' }} className="glass-panel">
         <h3 style={{ padding: '24px 24px 0', marginBottom: '16px' }}>Upload Instructions</h3>
         <div style={{ padding: '0 24px 24px' }}>
           <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>To bulk upload menu items, please follow these steps:</p>
           <ol style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--text-muted)' }}>
             <li>Download the CSV template using the button above.</li>
-            <li>Fill in your menu items. <strong>Category</strong>, <strong>ItemName</strong>, and <strong>Price</strong> are required.</li>
-            <li>Separate multiple DietaryTags with commas (e.g. <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>Fasting, Vegan</code>).</li>
+            <li>Fill in your menu items. Make sure to keep the column headers in <strong>small letters</strong>. <strong>category</strong>, <strong>itemname</strong>, and <strong>price</strong> are required.</li>
+            <li>Separate multiple dietary tags with commas (e.g. <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>Fasting, Vegan</code>).</li>
             <li>If a Category or Dietary Tag doesn't exist yet, it will be created automatically.</li>
             <li>Save the file as CSV and upload it here.</li>
           </ol>

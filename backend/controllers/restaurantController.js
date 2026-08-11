@@ -83,3 +83,32 @@ export const getAllRestaurants = async (req, res) => {
     res.status(500).json({ message: 'Server Error: ' + error.message });
   }
 };
+
+// @desc    Delete a restaurant and its associated data
+// @route   DELETE /api/restaurants/:id
+export const deleteRestaurant = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (req.user.role !== 'SUPER_ADMIN') {
+      return res.status(403).json({ message: 'Not authorized to delete restaurants' });
+    }
+
+    const restaurant = await Restaurant.findByIdAndDelete(id);
+
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+
+    // Cascade delete related entities
+    await import('../models/User.js').then(m => m.default.deleteMany({ restaurantId: id }));
+    await import('../models/Category.js').then(m => m.default.deleteMany({ restaurantId: id }));
+    await import('../models/MenuItem.js').then(m => m.default.deleteMany({ restaurantId: id }));
+    await import('../models/DietaryTag.js').then(m => m.default.deleteMany({ restaurantId: id }));
+    await import('../models/Feedback.js').then(m => m.default.deleteMany({ restaurantId: id }));
+
+    res.status(200).json({ message: 'Restaurant and all associated data deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: ' + error.message });
+  }
+};
