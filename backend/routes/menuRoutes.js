@@ -7,8 +7,6 @@ import {
   deleteMenuItem,
   updateCategory,
   updateMenuItem,
-  updateCategory,
-  updateMenuItem,
   bulkUploadMenu,
   createDietaryTag,
   deleteDietaryTag,
