@@ -7,6 +7,7 @@ import PaymentModal from './PaymentModal';
 import FeedbackModal from './FeedbackModal';
 import Footer from './Footer';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactGA from 'react-ga4';
 import './CustomerMenuUI.css';
 
 function CustomerMenu() {
@@ -54,6 +55,11 @@ function CustomerMenu() {
       
       if (menuD.categories.length > 0) {
         setActiveCategory(menuD.categories[0]._id);
+      }
+
+      // Track menu page view in GA4
+      if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
+        ReactGA.send({ hitType: "pageview", page: `/${restaurantData.slug || 'demo'}`, title: `${restaurantData.name} Menu` });
       }
     } catch (err) {
       setError(err.message);
@@ -184,7 +190,17 @@ function CustomerMenu() {
                   key={item._id} 
                   item={item} 
                   index={index}
-                  onClick={(i) => setSelectedItem(i)}
+                  onClick={(i) => {
+                    setSelectedItem(i);
+                    // Track item click event
+                    if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
+                      ReactGA.event({
+                        category: "Menu Activity",
+                        action: "Clicked Item",
+                        label: i.name,
+                      });
+                    }
+                  }}
                 />
               ))}
             </div>
