@@ -243,12 +243,14 @@ export const updateDietaryTag = async (req, res) => {
         updateQuery.restaurantId = req.user.restaurantId;
       }
       
-      // Update this tag string in all menu items that used the old tag name
-      await MenuItem.updateMany(
-        updateQuery,
-        { $set: { "dietaryTags.$[elem]": updatedTag.name } },
-        { arrayFilters: [{ "elem": oldName }] }
-      );
+      // Find all menu items that contain the old tag name
+      updateQuery.dietaryTags = oldName;
+      const itemsToUpdate = await MenuItem.find(updateQuery);
+      
+      for (const item of itemsToUpdate) {
+        item.dietaryTags = item.dietaryTags.map(t => t === oldName ? updatedTag.name : t);
+        await item.save();
+      }
     }
 
     res.status(200).json(updatedTag);
