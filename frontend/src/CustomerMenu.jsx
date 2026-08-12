@@ -121,7 +121,6 @@ function CustomerMenu() {
   return (
     <>
       <div className="menu-container" style={{ paddingBottom: '100px' }}>
-        <div className="animate-slide-up">
           <header 
             className="customer-hero"
             style={{ 
@@ -195,11 +194,10 @@ function CustomerMenu() {
 
       {/* Empty Search State */}
       {searchQuery && menuData.items.filter(i => i.name.toLowerCase().includes(searchLower)).length === 0 && (
-        <div className="empty-state">
+      <div className="empty-state">
           No items found matching "{searchQuery}"
         </div>
       )}
-      </div> {/* Close animate-slide-up */}
 
       {/* Floating Action Bar (FAB) */}
       <div className="fab-container">
