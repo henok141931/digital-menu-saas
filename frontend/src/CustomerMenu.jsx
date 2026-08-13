@@ -25,6 +25,7 @@ function CustomerMenu() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showFilterModal, setShowFilterModal] = useState(false);
 
   // Refs for ScrollSpy
   const categoryRefs = useRef({});
@@ -160,35 +161,38 @@ function CustomerMenu() {
             </div>
           </header>
 
-      <div className="search-container">
+      <div className="search-container" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <input 
           type="text" 
           placeholder={t('menu.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
+          style={{ flex: 1 }}
         />
-      </div>
-
-      {menuData.tags && menuData.tags.length > 0 && (
-        <div className="filter-chips-container" style={{ padding: '0 16px', marginBottom: '16px', display: 'flex', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        {menuData.tags && menuData.tags.length > 0 && (
           <button 
-            className={`filter-chip ${filterTag === 'All' ? 'active' : ''}`}
-            onClick={() => setFilterTag('All')}
+            className="filter-btn"
+            onClick={() => setShowFilterModal(true)}
+            style={{ 
+              position: 'relative',
+              background: 'white', 
+              border: '1px solid var(--border-color)', 
+              borderRadius: '20px', 
+              width: '42px', 
+              height: '42px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              color: filterTag !== 'All' ? 'var(--brand-color)' : 'var(--text-main)',
+              borderColor: filterTag !== 'All' ? 'var(--brand-color)' : 'var(--border-color)'
+            }}
           >
-            {i18n.language === 'am' ? 'ሁሉም' : 'All'}
+            <i className="fa-solid fa-sliders"></i>
+            {filterTag !== 'All' && <span style={{ position: 'absolute', top: '8px', right: '8px', width: '8px', height: '8px', background: 'var(--brand-color)', borderRadius: '50%' }}></span>}
           </button>
-          {menuData.tags.map(tag => (
-            <button 
-              key={tag._id}
-              className={`filter-chip ${filterTag === tag.name ? 'active' : ''}`}
-              onClick={() => setFilterTag(tag.name)}
-            >
-              {i18n.language === 'am' && tag.nameAm ? tag.nameAm : tag.name}
-            </button>
-          ))}
-        </div>
-      )}
+        )}
+      </div>
 
       {!searchQuery && (
         <div className="category-nav-wrapper">
@@ -271,6 +275,41 @@ function CustomerMenu() {
         {showPaymentModal && <PaymentModal restaurant={restaurant} onClose={() => setShowPaymentModal(false)} />}
         {showFeedbackModal && <FeedbackModal restaurant={restaurant} onClose={() => setShowFeedbackModal(false)} />}
         {selectedItem && <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+        {showFilterModal && (
+          <div className="modal-overlay" onClick={() => setShowFilterModal(false)} style={{ zIndex: 100 }}>
+            <motion.div 
+              className="modal-content bottom-sheet"
+              onClick={e => e.stopPropagation()}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+              style={{ padding: '24px', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', position: 'absolute', bottom: 0, width: '100%', maxWidth: '500px' }}
+            >
+              <div style={{ width: '40px', height: '4px', background: 'var(--border-color)', borderRadius: '2px', margin: '0 auto 20px' }}></div>
+              <h2 style={{ marginBottom: '20px', fontSize: '20px' }}>{i18n.language === 'am' ? 'የአመጋገብ ምርጫዎች' : 'Dietary Preferences'}</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button 
+                  className={`filter-chip ${filterTag === 'All' ? 'active' : ''}`}
+                  onClick={() => { setFilterTag('All'); setShowFilterModal(false); }}
+                  style={{ textAlign: 'left', padding: '16px', fontSize: '16px', borderRadius: '12px', width: '100%' }}
+                >
+                  {i18n.language === 'am' ? 'ሁሉም' : 'All Items'}
+                </button>
+                {menuData.tags.map(tag => (
+                  <button 
+                    key={tag._id}
+                    className={`filter-chip ${filterTag === tag.name ? 'active' : ''}`}
+                    onClick={() => { setFilterTag(tag.name); setShowFilterModal(false); }}
+                    style={{ textAlign: 'left', padding: '16px', fontSize: '16px', borderRadius: '12px', width: '100%' }}
+                  >
+                    {i18n.language === 'am' && tag.nameAm ? tag.nameAm : tag.name}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
       
       <Footer restaurant={restaurant} />
