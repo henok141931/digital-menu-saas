@@ -8,13 +8,36 @@ export default function MenuCard({ item, onClick, index = 0 }) {
   return (
     <motion.div 
       className="menu-card" 
-      onClick={() => onClick(item)}
+      onClick={() => { if (item.isAvailable !== false) onClick(item) }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
-      whileTap={{ scale: 0.98 }}
+      whileTap={item.isAvailable !== false ? { scale: 0.98 } : {}}
+      style={{
+        position: 'relative',
+        opacity: item.isAvailable === false ? 0.6 : 1,
+        filter: item.isAvailable === false ? 'grayscale(80%)' : 'none',
+        cursor: item.isAvailable === false ? 'not-allowed' : 'pointer'
+      }}
     >
+      {item.isAvailable === false && (
+        <div style={{
+          position: 'absolute',
+          top: '12px',
+          right: '12px',
+          background: '#ef4444',
+          color: 'white',
+          padding: '4px 10px',
+          borderRadius: '4px',
+          fontSize: '11px',
+          fontWeight: 'bold',
+          zIndex: 10,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        }}>
+          {i18n.language === 'am' ? 'አልቋል' : 'Out of Stock'}
+        </div>
+      )}
       <div className="card-info">
         <div className="card-header">
           <h3>{displayName}</h3>

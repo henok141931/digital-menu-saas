@@ -94,6 +94,7 @@ function SuperAdminDashboard() {
               {activeTab === 'restaurants' && (
                 <SuperAdminRestaurantsTab 
                   restaurants={restaurants} 
+                  setRestaurants={setRestaurants}
                   fetchRestaurants={fetchRestaurants} 
                 />
               )}

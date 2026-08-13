@@ -55,11 +55,8 @@ export const getFullMenu = async (req, res) => {
 
     const categories = await Category.find({ restaurantId, isActive: true }).sort({ sortOrder: 1 });
     
-    // If ?all=true, fetch all items. Otherwise, only available items (for customer menu).
+    // Fetch all items for both admin and customer (customer frontend will handle out of stock styling)
     const itemQuery = { restaurantId };
-    if (all !== 'true') {
-      itemQuery.isAvailable = true;
-    }
     
     const items = await MenuItem.find(itemQuery).sort({ sortOrder: 1 });
     const tags = await DietaryTag.find({ restaurantId });

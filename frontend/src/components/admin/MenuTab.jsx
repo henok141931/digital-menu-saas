@@ -5,7 +5,7 @@ import ConfirmModal from '../../ConfirmModal';
 import { BASE_URL } from '../../config';
 import Toast from '../../Toast';
 
-export default function MenuTab({ menuData, refreshMenu, restaurant }) {
+export default function MenuTab({ menuData, setMenuData, refreshMenu, restaurant }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTag, setFilterTag] = useState('All');
   
@@ -108,6 +108,14 @@ export default function MenuTab({ menuData, refreshMenu, restaurant }) {
   };
 
   const handleToggleAvailability = async (id, currentStatus) => {
+    // Optimistic UI update
+    if (setMenuData) {
+      setMenuData(prev => ({
+        ...prev,
+        items: prev.items.map(item => item._id === id ? { ...item, isAvailable: !currentStatus } : item)
+      }));
+    }
+
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${BASE_URL}/api/menu/items/${id}/availability`, {
@@ -118,9 +126,15 @@ export default function MenuTab({ menuData, refreshMenu, restaurant }) {
       });
       if (!res.ok) throw new Error('Failed to toggle availability');
       Toast.success(currentStatus ? 'Item marked Out of Stock' : 'Item marked Available');
-      refreshMenu();
     } catch (err) {
       Toast.error(err.message);
+      // Revert on failure
+      if (setMenuData) {
+        setMenuData(prev => ({
+          ...prev,
+          items: prev.items.map(item => item._id === id ? { ...item, isAvailable: currentStatus } : item)
+        }));
+      }
     }
   };
 
@@ -139,7 +153,7 @@ export default function MenuTab({ menuData, refreshMenu, restaurant }) {
         description: newItemDesc,
         descriptionAm: newItemDescAm,
         price: parseFloat(newItemPrice),
-        category: newItemCatId,
+        categoryId: newItemCatId,
         dietaryTags: newItemDietary,
         imageUrl: newItemImage
       };

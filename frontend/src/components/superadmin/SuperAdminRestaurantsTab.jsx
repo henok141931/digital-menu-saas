@@ -3,7 +3,7 @@ import { BASE_URL } from '../../config';
 import Toast from '../../Toast';
 import ConfirmModal from '../../ConfirmModal';
 
-export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants }) {
+export default function SuperAdminRestaurantsTab({ restaurants, setRestaurants, fetchRestaurants }) {
   const [newRestName, setNewRestName] = useState('');
   const [newRestSlug, setNewRestSlug] = useState('');
   const [newRestDesc, setNewRestDesc] = useState('');
@@ -99,6 +99,9 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
   };
 
   const handleToggleAmharic = async (restId, currentValue) => {
+    // Optimistic UI update
+    setRestaurants(restaurants.map(r => r._id === restId ? { ...r, enableAmharic: !currentValue } : r));
+
     try {
       const res = await fetch(`${BASE_URL}/api/restaurants/${restId}`, {
         method: 'PUT',
@@ -110,9 +113,10 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
       });
       if (!res.ok) throw new Error('Failed to update Amharic setting');
       showToast('Amharic setting updated!');
-      fetchRestaurants();
     } catch (err) {
       showToast(err.message, 'error');
+      // Revert on failure
+      setRestaurants(restaurants.map(r => r._id === restId ? { ...r, enableAmharic: currentValue } : r));
     }
   };
 
@@ -186,48 +190,52 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
         {/* RESTAURANT LIST & ANALYTICS */}
         <section className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
           <h2 style={{ marginBottom: '16px' }}>Active Restaurants & Analytics</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {restaurants.map(rest => (
-              <div key={rest._id} className="glass-panel" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ margin: '0 0 4px 0', fontSize: '18px' }}>{rest.name}</h3>
-                  <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '14px' }}>
-                    URL: <a href={`/${rest.slug}`} target="_blank" rel="noreferrer" style={{ color: 'var(--brand-color)' }}>/{rest.slug}</a>
-                  </p>
-                </div>
-                
-                <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <label style={{ fontSize: '13px', fontWeight: '500' }}>Amharic</label>
-                    <label className="switch">
-                      <input 
-                        type="checkbox" 
-                        checked={rest.enableAmharic || false}
-                        onChange={() => handleToggleAmharic(rest._id, rest.enableAmharic)}
-                      />
-                      <span className="slider round"></span>
-                    </label>
-                  </div>
-                  
-                  <div>
-                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-main)' }}>
-                      {rest.viewCount || 0}
-                    </div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      Total Scans
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setDeleteId(rest._id)} 
-                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px', fontSize: '18px' }}
-                    title="Delete Restaurant"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            ))}
-            {restaurants.length === 0 && <p className="empty-state">No restaurants found.</p>}
+          <div className="glass-panel" style={{ overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'rgba(0,0,0,0.02)' }}>
+                  <th style={{ padding: '16px', fontWeight: '600' }}>Restaurant</th>
+                  <th style={{ padding: '16px', fontWeight: '600' }}>URL</th>
+                  <th style={{ padding: '16px', fontWeight: '600' }}>Total Scans</th>
+                  <th style={{ padding: '16px', fontWeight: '600' }}>Amharic Support</th>
+                  <th style={{ padding: '16px', fontWeight: '600', textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {restaurants.map(rest => (
+                  <tr key={rest._id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background-color 0.2s', ':hover': { backgroundColor: 'var(--bg-main)' } }}>
+                    <td style={{ padding: '16px', fontWeight: '500' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span>{rest.name}</span>
+                        <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>ID: {rest._id.slice(-6)}</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '16px' }}><a href={`/${rest.slug}`} target="_blank" rel="noreferrer" style={{ color: 'var(--brand-color)', textDecoration: 'none', fontWeight: '500' }}>/{rest.slug}</a></td>
+                    <td style={{ padding: '16px', fontWeight: '600', color: 'var(--text-main)' }}>{rest.viewCount || 0}</td>
+                    <td style={{ padding: '16px' }}>
+                      <label className="switch">
+                        <input 
+                          type="checkbox" 
+                          checked={rest.enableAmharic || false}
+                          onChange={() => handleToggleAmharic(rest._id, rest.enableAmharic)}
+                        />
+                        <span className="slider round"></span>
+                      </label>
+                    </td>
+                    <td style={{ padding: '16px', textAlign: 'right' }}>
+                      <button 
+                        onClick={() => setDeleteId(rest._id)} 
+                        style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px', fontSize: '18px', borderRadius: '4px', transition: 'background-color 0.2s' }}
+                        title="Delete Restaurant"
+                      >
+                        <i className="fa-solid fa-trash-can"></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {restaurants.length === 0 && <p style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>No restaurants found.</p>}
           </div>
         </section>
 

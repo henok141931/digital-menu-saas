@@ -158,7 +158,7 @@ export default function AdminDashboard() {
       )}
       
       {activeTab === 'menu' && (
-        <MenuTab menuData={menuData} refreshMenu={refreshMenu} restaurant={restaurantData} />
+        <MenuTab menuData={menuData} setMenuData={setMenuData} refreshMenu={refreshMenu} restaurant={restaurantData} />
       )}
       
       {activeTab === 'taxonomy' && (
