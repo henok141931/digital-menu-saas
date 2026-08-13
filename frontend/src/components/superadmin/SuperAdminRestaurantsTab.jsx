@@ -98,6 +98,24 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
     }
   };
 
+  const handleToggleAmharic = async (restId, currentValue) => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/restaurants/${restId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ enableAmharic: !currentValue })
+      });
+      if (!res.ok) throw new Error('Failed to update Amharic setting');
+      showToast('Amharic setting updated!');
+      fetchRestaurants();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
   return (
     <div className="tab-pane">
       {error && <div className="status error" style={{ marginBottom: '16px' }}>{error}</div>}
@@ -179,6 +197,18 @@ export default function SuperAdminRestaurantsTab({ restaurants, fetchRestaurants
                 </div>
                 
                 <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '500' }}>Amharic</label>
+                    <label className="switch">
+                      <input 
+                        type="checkbox" 
+                        checked={rest.enableAmharic || false}
+                        onChange={() => handleToggleAmharic(rest._id, rest.enableAmharic)}
+                      />
+                      <span className="slider round"></span>
+                    </label>
+                  </div>
+                  
                   <div>
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-main)' }}>
                       {rest.viewCount || 0}
