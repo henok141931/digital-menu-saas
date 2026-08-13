@@ -60,7 +60,7 @@ export default function AdminDashboard() {
       }
 
       // Fetch Menu
-      const menuRes = await fetch(`${BASE_URL}/api/menu/${restaurantId}`, {
+      const menuRes = await fetch(`${BASE_URL}/api/menu/${restaurantId}?all=true`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (menuRes.ok) {
@@ -95,11 +95,11 @@ export default function AdminDashboard() {
     navigate('/login');
   };
 
-  // Callback to refresh menu data after edits
+  // Callback to refresh menu data after edits without full page loader
   const refreshMenu = async () => {
     const token = localStorage.getItem('token');
     const restaurantId = localStorage.getItem('restaurantId');
-    const menuRes = await fetch(`${BASE_URL}/api/menu/${restaurantId}`, {
+    const menuRes = await fetch(`${BASE_URL}/api/menu/${restaurantId}?all=true`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
     if (menuRes.ok) {
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
       )}
       
       {activeTab === 'menu' && (
-        <MenuTab menuData={menuData} refreshMenu={() => fetchDashboardData(localStorage.getItem('token'))} restaurant={restaurantData} />
+        <MenuTab menuData={menuData} refreshMenu={refreshMenu} restaurant={restaurantData} />
       )}
       
       {activeTab === 'taxonomy' && (

@@ -51,9 +51,17 @@ export const createMenuItem = async (req, res) => {
 export const getFullMenu = async (req, res) => {
   try {
     const { restaurantId } = req.params;
+    const { all } = req.query;
 
     const categories = await Category.find({ restaurantId, isActive: true }).sort({ sortOrder: 1 });
-    const items = await MenuItem.find({ restaurantId, isAvailable: true }).sort({ sortOrder: 1 });
+    
+    // If ?all=true, fetch all items. Otherwise, only available items (for customer menu).
+    const itemQuery = { restaurantId };
+    if (all !== 'true') {
+      itemQuery.isAvailable = true;
+    }
+    
+    const items = await MenuItem.find(itemQuery).sort({ sortOrder: 1 });
     const tags = await DietaryTag.find({ restaurantId });
 
     res.status(200).json({ categories, items, tags });
