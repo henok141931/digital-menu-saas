@@ -343,6 +343,7 @@ export const bulkUploadMenu = async (req, res) => {
           category = await Category.create({
             restaurantId,
             name: categoryName,
+            nameAm: row.categoryam ? row.categoryam.trim() : '',
             sortOrder: categoriesCreated // simple sort order
           });
           categoriesCreated++;
@@ -378,7 +379,9 @@ export const bulkUploadMenu = async (req, res) => {
           restaurantId,
           categoryId,
           name: row.itemname.trim(),
+          nameAm: row.nameam ? row.nameam.trim() : '',
           description: row.description ? row.description.trim() : '',
+          descriptionAm: row.descriptionam ? row.descriptionam.trim() : '',
           price: parsedPrice,
           dietaryTags: parsedTags,
           sortOrder: itemsCreated,

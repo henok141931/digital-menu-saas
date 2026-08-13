@@ -3,7 +3,7 @@ import Papa from 'papaparse';
 import { BASE_URL } from '../../config';
 import Toast from '../../Toast';
 
-export default function BulkUploadTab({ refreshMenu }) {
+export default function BulkUploadTab({ refreshMenu, restaurant }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploadingCSV, setIsUploadingCSV] = useState(false);
   const [uploadHistory, setUploadHistory] = useState([]);
@@ -14,6 +14,17 @@ export default function BulkUploadTab({ refreshMenu }) {
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "menu_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadAmharicTemplate = () => {
+    const csvContent = "data:text/csv;charset=utf-8,category,categoryAm,itemname,nameAm,description,descriptionAm,price,dietarytags\nStarters,መክሰስ,Garlic Bread,የነጭ ሽንኩርት ዳቦ,Crispy bread,የተጠበሰ ዳቦ,5.99,Fasting\nMains,ዋና ምግብ,Margherita Pizza,ማርጋሪታ ፒዛ,Classic pizza,ክላሲክ ፒዛ,12.99,Fasting\nMains,,Chicken Wings,,Spicy wings,,8.99,Non-Fasting";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "menu_template_dual_language.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -135,9 +146,16 @@ export default function BulkUploadTab({ refreshMenu }) {
     <div className="tab-pane">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <h2 style={{ fontSize: '24px', fontWeight: 'bold' }}>Bulk Upload</h2>
-        <button onClick={handleDownloadTemplate} className="add-btn" style={{ background: '#e2e8f0', color: 'var(--text-main)', border: 'none' }}>
-          ⬇️ Download CSV Template
-        </button>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <button onClick={handleDownloadTemplate} className="add-btn" style={{ background: '#e2e8f0', color: 'var(--text-main)', border: 'none' }}>
+            ⬇️ Download English CSV Template
+          </button>
+          {restaurant?.enableAmharic && (
+            <button onClick={handleDownloadAmharicTemplate} className="add-btn" style={{ background: '#dbeafe', color: '#1e40af', border: 'none' }}>
+              🇪🇹 ⬇️ Download Dual-Language CSV Template
+            </button>
+          )}
+        </div>
       </div>
       
       <div 
@@ -225,11 +243,14 @@ export default function BulkUploadTab({ refreshMenu }) {
         <div style={{ padding: '0 24px 24px' }}>
           <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>To bulk upload menu items, please follow these steps:</p>
           <ol style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--text-muted)' }}>
-            <li>Download the CSV template using the button above.</li>
+            <li>Download a CSV template using the buttons above.</li>
             <li>Fill in your menu items. Make sure to keep the column headers in <strong>small letters</strong>. <strong>category</strong>, <strong>itemname</strong>, and <strong>price</strong> are required.</li>
+            {restaurant?.enableAmharic && (
+              <li>If you downloaded the Dual-Language template, the Amharic columns (`categoryam`, `nameam`, `descriptionam`) are fully <strong>optional</strong>. If left blank, the system will just skip the translation for that item.</li>
+            )}
             <li>Separate multiple dietary tags with commas (e.g. <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>Fasting, Vegan</code>).</li>
             <li>If a Category or Dietary Tag doesn't exist yet, it will be created automatically.</li>
-            <li>Save the file as CSV and upload it here.</li>
+            <li>Save the file as CSV and upload it here. The system will automatically process whichever template you upload!</li>
           </ol>
         </div>
       </div>

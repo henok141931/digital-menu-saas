@@ -166,7 +166,7 @@ export default function AdminDashboard() {
       )}
       
       {activeTab === 'bulk' && (
-        <BulkUploadTab refreshMenu={refreshMenu} />
+        <BulkUploadTab refreshMenu={refreshMenu} restaurant={restaurantData} />
       )}
       
       {activeTab === 'reviews' && (
