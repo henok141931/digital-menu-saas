@@ -7,6 +7,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
   const [brandColor, setBrandColor] = useState(restaurant?.brandColor || '#3b82f6');
   const [secondaryColor, setSecondaryColor] = useState(restaurant?.secondaryColor || '#1e40af');
   const [coverImageUrl, setCoverImageUrl] = useState(restaurant?.coverImageUrl || '');
+  const [enableAmharic, setEnableAmharic] = useState(restaurant?.enableAmharic || false);
   const [isColorSubmitting, setIsColorSubmitting] = useState(false);
 
   const [paymentMethods, setPaymentMethods] = useState(restaurant?.paymentMethods || []);
@@ -45,7 +46,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
 
   const handleColorUpdate = (e) => {
     e.preventDefault();
-    handleUpdateSection('Branding', { brandColor, secondaryColor, coverImageUrl }, setIsColorSubmitting);
+    handleUpdateSection('Branding & Features', { brandColor, secondaryColor, coverImageUrl, enableAmharic }, setIsColorSubmitting);
   };
 
   const handlePaymentUpdate = (e) => {
@@ -109,8 +110,22 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
               <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Displays at the top of the customer menu</div>
             </div>
 
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <input 
+                type="checkbox" 
+                id="enableAmharic" 
+                checked={enableAmharic} 
+                onChange={(e) => setEnableAmharic(e.target.checked)} 
+                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+              />
+              <div>
+                <label htmlFor="enableAmharic" style={{ fontWeight: '600', cursor: 'pointer' }}>Enable Amharic (Dual-Language)</label>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Show a language toggle on your live menu and allow Amharic translations for items.</div>
+              </div>
+            </div>
+
             <button type="submit" disabled={isColorSubmitting} className="add-btn primary" style={{ marginTop: '8px' }}>
-              {isColorSubmitting ? 'Saving...' : 'Save Branding'}
+              {isColorSubmitting ? 'Saving...' : 'Save Branding & Features'}
             </button>
           </form>
         </div>

@@ -158,11 +158,11 @@ export default function AdminDashboard() {
       )}
       
       {activeTab === 'menu' && (
-        <MenuTab menuData={menuData} refreshMenu={refreshMenu} />
+        <MenuTab menuData={menuData} refreshMenu={() => fetchDashboardData(localStorage.getItem('token'))} restaurant={restaurantData} />
       )}
       
       {activeTab === 'taxonomy' && (
-        <TaxonomyTab menuData={menuData} refreshMenu={refreshMenu} />
+        <TaxonomyTab menuData={menuData} refreshMenu={refreshMenu} restaurant={restaurantData} />
       )}
       
       {activeTab === 'bulk' && (

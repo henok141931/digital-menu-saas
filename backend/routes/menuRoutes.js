@@ -11,7 +11,8 @@ import {
   createDietaryTag,
   deleteDietaryTag,
   updateDietaryTag,
-  bulkDeleteMenuItems
+  bulkDeleteMenuItems,
+  toggleMenuItemAvailability
 } from '../controllers/menuController.js';
 import { protect, authorize, tenantScope } from '../middleware/authMiddleware.js';
 
@@ -49,6 +50,9 @@ router.delete('/items/:id', protect, authorize('SUPER_ADMIN', 'ADMIN'), deleteMe
 
 // PUT /api/menu/items/:id -> Updates a menu item (Admin only)
 router.put('/items/:id', protect, authorize('SUPER_ADMIN', 'ADMIN'), updateMenuItem);
+
+// PATCH /api/menu/items/:id/availability -> Toggles availability (Admin only)
+router.patch('/items/:id/availability', protect, authorize('SUPER_ADMIN', 'ADMIN'), toggleMenuItemAvailability);
 
 // GET /api/menu/:restaurantId -> Fetches the full menu for a restaurant (Public)
 router.get('/:restaurantId', getFullMenu);

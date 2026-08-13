@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import BaseModal from './BaseModal';
 import './App.css';
 
-function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
+function EditItemModal({ item, categories, tags = [], restaurant, onClose, onSave }) {
   const [name, setName] = useState('');
+  const [nameAm, setNameAm] = useState('');
   const [description, setDescription] = useState('');
+  const [descriptionAm, setDescriptionAm] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -15,7 +17,9 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
   useEffect(() => {
     if (item) {
       setName(item.name || '');
+      setNameAm(item.nameAm || '');
       setDescription(item.description || '');
+      setDescriptionAm(item.descriptionAm || '');
       setPrice(item.price || '');
       setImageUrl(item.imageUrl || '');
       setCategoryId(item.categoryId || '');
@@ -61,7 +65,9 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
     
     const updatedData = {
       name,
+      nameAm,
       description,
+      descriptionAm,
       price: Number(price),
       imageUrl,
       categoryId,
@@ -79,16 +85,30 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
       <h2 style={{ marginBottom: '20px', color: 'var(--text-main)', fontSize: '20px' }}>Edit Menu Item</h2>
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Name</label>
-            <input 
-              type="text" 
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="admin-input" 
-              style={{ width: '100%' }}
-              required 
-            />
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Name (English)</label>
+              <input 
+                type="text" 
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="admin-input" 
+                style={{ width: '100%' }}
+                required 
+              />
+            </div>
+            {restaurant?.enableAmharic && (
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Name (Amharic)</label>
+                <input 
+                  type="text" 
+                  value={nameAm}
+                  onChange={e => setNameAm(e.target.value)}
+                  className="admin-input" 
+                  style={{ width: '100%' }}
+                />
+              </div>
+            )}
           </div>
 
           <div>
@@ -106,14 +126,27 @@ function EditItemModal({ item, categories, tags = [], onClose, onSave }) {
             </select>
           </div>
           
-          <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Description</label>
-            <textarea 
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              className="admin-input" 
-              style={{ width: '100%', minHeight: '80px', resize: 'vertical' }}
-            />
+          <div style={{ display: 'flex', gap: '16px', flexDirection: restaurant?.enableAmharic ? 'row' : 'column' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Description (English)</label>
+              <textarea 
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                className="admin-input" 
+                style={{ width: '100%', minHeight: '80px', resize: 'vertical' }}
+              />
+            </div>
+            {restaurant?.enableAmharic && (
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontSize: '14px' }}>Description (Amharic)</label>
+                <textarea 
+                  value={descriptionAm}
+                  onChange={e => setDescriptionAm(e.target.value)}
+                  className="admin-input" 
+                  style={{ width: '100%', minHeight: '80px', resize: 'vertical' }}
+                />
+              </div>
+            )}
           </div>
           
           <div style={{ display: 'flex', gap: '16px' }}>

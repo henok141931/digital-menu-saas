@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function MenuCard({ item, onClick, index = 0 }) {
+  const { i18n } = useTranslation();
+  const displayName = i18n.language === 'am' && item.nameAm ? item.nameAm : item.name;
+  const displayDesc = i18n.language === 'am' && item.descriptionAm ? item.descriptionAm : item.description;
   return (
     <motion.div 
       className="menu-card" 
@@ -13,10 +17,10 @@ export default function MenuCard({ item, onClick, index = 0 }) {
     >
       <div className="card-info">
         <div className="card-header">
-          <h3>{item.name}</h3>
+          <h3>{displayName}</h3>
           <span className="price">{item.price} ETB</span>
         </div>
-        <p className="desc">{item.description}</p>
+        <p className="desc">{displayDesc}</p>
         
         {item.dietaryTags && item.dietaryTags.length > 0 && (
           <div className="dietary-tags" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -30,7 +34,7 @@ export default function MenuCard({ item, onClick, index = 0 }) {
       </div>
       
       {item.imageUrl && (
-        <img src={item.imageUrl} alt={item.name} className="card-image" loading="lazy" />
+        <img src={item.imageUrl} alt={displayName} className="card-image" loading="lazy" />
       )}
     </motion.div>
   );

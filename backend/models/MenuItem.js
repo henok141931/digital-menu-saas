@@ -19,7 +19,16 @@ const menuItemSchema = new mongoose.Schema(
       required: [true, 'Item name is required'],
       trim: true,
     },
+    nameAm: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     description: {
+      type: String,
+      default: '',
+    },
+    descriptionAm: {
       type: String,
       default: '',
     },

@@ -13,6 +13,11 @@ const categorySchema = new mongoose.Schema(
       required: [true, 'Category name is required'],
       trim: true,
     },
+    nameAm: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     sortOrder: {
       type: Number,
       default: 0,

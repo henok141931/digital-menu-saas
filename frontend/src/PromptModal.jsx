@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
-function PromptModal({ isOpen, title, initialValue, placeholder, onConfirm, onCancel }) {
+function PromptModal({ isOpen, title, initialValue, initialValueAm, placeholder, showAmharic, onConfirm, onCancel }) {
   const [inputValue, setInputValue] = useState('');
+  const [inputValueAm, setInputValueAm] = useState('');
 
   useEffect(() => {
     if (isOpen) {
       setInputValue(initialValue || '');
+      setInputValueAm(initialValueAm || '');
     }
-  }, [isOpen, initialValue]);
+  }, [isOpen, initialValue, initialValueAm]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (inputValue.trim()) {
-      onConfirm(inputValue.trim());
+      onConfirm(inputValue.trim(), inputValueAm.trim());
     }
   };
 
@@ -36,6 +38,17 @@ function PromptModal({ isOpen, title, initialValue, placeholder, onConfirm, onCa
             required
             style={{ width: '100%', padding: '12px', fontSize: '15px' }}
           />
+          
+          {showAmharic && (
+            <input 
+              type="text" 
+              value={inputValueAm}
+              onChange={(e) => setInputValueAm(e.target.value)}
+              placeholder={`${placeholder} (Amharic)`}
+              className="admin-input"
+              style={{ width: '100%', padding: '12px', fontSize: '15px' }}
+            />
+          )}
           
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
             <button 

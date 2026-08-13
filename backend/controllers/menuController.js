@@ -6,11 +6,12 @@ import DietaryTag from '../models/DietaryTag.js';
 // @route   POST /api/menu/categories
 export const createCategory = async (req, res) => {
   try {
-    const { restaurantId, name, sortOrder } = req.body;
+    const { restaurantId, name, nameAm, sortOrder } = req.body;
 
     const category = await Category.create({
       restaurantId,
       name,
+      nameAm: nameAm || '',
       sortOrder: sortOrder || 0,
     });
 
@@ -24,13 +25,15 @@ export const createCategory = async (req, res) => {
 // @route   POST /api/menu/items
 export const createMenuItem = async (req, res) => {
   try {
-    const { restaurantId, categoryId, name, description, price, imageUrl, sortOrder, dietaryTags } = req.body;
+    const { restaurantId, categoryId, name, nameAm, description, descriptionAm, price, imageUrl, sortOrder, dietaryTags } = req.body;
 
     const menuItem = await MenuItem.create({
       restaurantId,
       categoryId,
       name,
+      nameAm: nameAm || '',
       description,
+      descriptionAm: descriptionAm || '',
       price,
       imageUrl: imageUrl || null,
       sortOrder: sortOrder || 0,
@@ -111,7 +114,7 @@ export const deleteMenuItem = async (req, res) => {
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, sortOrder, isActive } = req.body;
+    const { name, nameAm, sortOrder, isActive } = req.body;
 
     const category = await Category.findById(id);
 
@@ -124,6 +127,7 @@ export const updateCategory = async (req, res) => {
     }
 
     category.name = name || category.name;
+    if (nameAm !== undefined) category.nameAm = nameAm;
     if (sortOrder !== undefined) category.sortOrder = sortOrder;
     if (isActive !== undefined) category.isActive = isActive;
 
@@ -139,7 +143,7 @@ export const updateCategory = async (req, res) => {
 export const updateMenuItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, imageUrl, sortOrder, isAvailable, dietaryTags, categoryId } = req.body;
+    const { name, nameAm, description, descriptionAm, price, imageUrl, sortOrder, isAvailable, dietaryTags, categoryId } = req.body;
 
     const item = await MenuItem.findById(id);
 
@@ -152,7 +156,9 @@ export const updateMenuItem = async (req, res) => {
     }
 
     item.name = name || item.name;
+    if (nameAm !== undefined) item.nameAm = nameAm;
     if (description !== undefined) item.description = description;
+    if (descriptionAm !== undefined) item.descriptionAm = descriptionAm;
     item.price = price || item.price;
     if (imageUrl !== undefined) item.imageUrl = imageUrl;
     if (sortOrder !== undefined) item.sortOrder = sortOrder;
@@ -161,6 +167,30 @@ export const updateMenuItem = async (req, res) => {
     if (categoryId !== undefined) item.categoryId = categoryId;
 
     const updatedItem = await item.save();
+    res.status(200).json(updatedItem);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: ' + error.message });
+  }
+};
+
+// @desc    Toggle item availability
+// @route   PATCH /api/menu/items/:id/availability
+export const toggleMenuItemAvailability = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const item = await MenuItem.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Menu item not found' });
+    }
+
+    if (req.user.role !== 'SUPER_ADMIN' && item.restaurantId.toString() !== req.user.restaurantId.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update this item' });
+    }
+
+    item.isAvailable = !item.isAvailable;
+    const updatedItem = await item.save();
+    
     res.status(200).json(updatedItem);
   } catch (error) {
     res.status(500).json({ message: 'Server Error: ' + error.message });

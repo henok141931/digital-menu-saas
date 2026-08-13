@@ -8,6 +8,7 @@ import FeedbackModal from './FeedbackModal';
 import Footer from './Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactGA from 'react-ga4';
+import { useTranslation } from 'react-i18next';
 import './CustomerMenuUI.css';
 
 function CustomerMenu() {
@@ -16,6 +17,7 @@ function CustomerMenu() {
   const [menuData, setMenuData] = useState({ categories: [], items: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t, i18n } = useTranslation();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
@@ -130,9 +132,26 @@ function CustomerMenu() {
           <header 
             className="customer-hero"
             style={{ 
-              backgroundImage: restaurant.coverImageUrl ? `url(${restaurant.coverImageUrl})` : `linear-gradient(135deg, var(--brand-color) 0%, var(--secondary-color, #1e40af) 100%)`
+              backgroundImage: restaurant.coverImageUrl ? `url(${restaurant.coverImageUrl})` : `linear-gradient(135deg, var(--brand-color) 0%, var(--secondary-color, #1e40af) 100%)`,
+              position: 'relative'
             }}
           >
+            {restaurant.enableAmharic && (
+              <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10 }}>
+                <button 
+                  onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'am' : 'en')}
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', 
+                    border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white', 
+                    padding: '6px 12px', borderRadius: '20px', cursor: 'pointer',
+                    fontWeight: 'bold', fontSize: '14px', display: 'flex', gap: '6px', alignItems: 'center'
+                  }}
+                >
+                  <i className="fa-solid fa-globe"></i> {i18n.language === 'en' ? 'አማርኛ' : 'English'}
+                </button>
+              </div>
+            )}
+            
             {restaurant.coverImageUrl && <div className="hero-overlay"></div>}
             <div className="hero-content">
               <h1>{restaurant.name}</h1>
@@ -143,7 +162,7 @@ function CustomerMenu() {
       <div className="search-container">
         <input 
           type="text" 
-          placeholder="Search menu..." 
+          placeholder={t('menu.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
@@ -160,7 +179,7 @@ function CustomerMenu() {
                 className={`category-tab ${activeCategory === cat._id ? 'active' : ''}`}
                 onClick={() => scrollToCategory(cat._id)}
               >
-                {cat.name}
+                {i18n.language === 'am' && cat.nameAm ? cat.nameAm : cat.name}
               </button>
             ))}
           </nav>
@@ -183,7 +202,7 @@ function CustomerMenu() {
             className="menu-section" 
             ref={el => categoryRefs.current[cat._id] = el}
           >
-            <h2 className="category-title">{cat.name}</h2>
+            <h2 className="category-title">{i18n.language === 'am' && cat.nameAm ? cat.nameAm : cat.name}</h2>
             <div>
               {categoryItems.map((item, index) => (
                 <MenuCard 
@@ -215,11 +234,10 @@ function CustomerMenu() {
         </div>
       )}
 
-      {/* Floating Action Bar (FAB) */}
       <div className="fab-container">
         {restaurant.paymentMethods && restaurant.paymentMethods.length > 0 && (
           <button onClick={() => setShowPaymentModal(true)} className="fab-btn secondary">
-            <i className="fa-solid fa-credit-card"></i> Payment
+            <i className="fa-solid fa-credit-card"></i> {t('menu.paymentMethods')}
           </button>
         )}
         <button onClick={() => setShowFeedbackModal(true)} className="fab-btn primary">

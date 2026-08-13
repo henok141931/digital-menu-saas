@@ -5,7 +5,7 @@ import ConfirmModal from '../../ConfirmModal';
 import { BASE_URL } from '../../config';
 import Toast from '../../Toast';
 
-export default function MenuTab({ menuData, refreshMenu }) {
+export default function MenuTab({ menuData, refreshMenu, restaurant }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTag, setFilterTag] = useState('All');
   
@@ -20,7 +20,9 @@ export default function MenuTab({ menuData, refreshMenu }) {
 
   // Add Item State
   const [newItemName, setNewItemName] = useState('');
+  const [newItemNameAm, setNewItemNameAm] = useState('');
   const [newItemDesc, setNewItemDesc] = useState('');
+  const [newItemDescAm, setNewItemDescAm] = useState('');
   const [newItemPrice, setNewItemPrice] = useState('');
   const [newItemCatId, setNewItemCatId] = useState('');
   const [newItemDietary, setNewItemDietary] = useState([]);
@@ -105,6 +107,23 @@ export default function MenuTab({ menuData, refreshMenu }) {
     }
   };
 
+  const handleToggleAvailability = async (id, currentStatus) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${BASE_URL}/api/menu/items/${id}/availability`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to toggle availability');
+      Toast.success(currentStatus ? 'Item marked Out of Stock' : 'Item marked Available');
+      refreshMenu();
+    } catch (err) {
+      Toast.error(err.message);
+    }
+  };
+
   const handleAddItem = async (e) => {
     e.preventDefault();
     if (isItemSubmitting) return;
@@ -116,7 +135,9 @@ export default function MenuTab({ menuData, refreshMenu }) {
       const payload = {
         restaurantId,
         name: newItemName,
+        nameAm: newItemNameAm,
         description: newItemDesc,
+        descriptionAm: newItemDescAm,
         price: parseFloat(newItemPrice),
         category: newItemCatId,
         dietaryTags: newItemDietary,
@@ -137,7 +158,9 @@ export default function MenuTab({ menuData, refreshMenu }) {
       
       // Reset form
       setNewItemName('');
+      setNewItemNameAm('');
       setNewItemDesc('');
+      setNewItemDescAm('');
       setNewItemPrice('');
       setNewItemCatId('');
       setNewItemDietary([]);
@@ -269,9 +292,25 @@ export default function MenuTab({ menuData, refreshMenu }) {
                       ))}
                     </div>
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button onClick={() => setEditingItem(item)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px', padding: '4px' }}>✏️</button>
-                      <button onClick={() => setItemToDelete(item)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px', padding: '4px', color: '#ef4444' }}>🗑️</button>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <div 
+                        onClick={() => handleToggleAvailability(item._id, item.isAvailable)}
+                        style={{ 
+                          width: '40px', height: '22px', borderRadius: '12px', 
+                          background: item.isAvailable ? '#22c55e' : '#cbd5e1', 
+                          position: 'relative', cursor: 'pointer', transition: '0.2s',
+                          marginRight: '8px'
+                        }}
+                        title={item.isAvailable ? "Mark Out of Stock" : "Mark Available"}
+                      >
+                        <div style={{
+                          width: '18px', height: '18px', borderRadius: '50%', background: 'white',
+                          position: 'absolute', top: '2px', left: item.isAvailable ? '20px' : '2px',
+                          transition: '0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                        }} />
+                      </div>
+                      <button onClick={() => setEditingItem(item)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px', padding: '4px' }} title="Edit Item">✏️</button>
+                      <button onClick={() => setItemToDelete(item)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '18px', padding: '4px', color: '#ef4444' }} title="Delete Item">🗑️</button>
                     </div>
                   </div>
                 ))}
@@ -291,6 +330,7 @@ export default function MenuTab({ menuData, refreshMenu }) {
           item={editingItem} 
           categories={menuData.categories}
           tags={menuData.tags}
+          restaurant={restaurant}
           onClose={() => setEditingItem(null)} 
           onSave={refreshMenu} 
         />
@@ -301,24 +341,51 @@ export default function MenuTab({ menuData, refreshMenu }) {
         <h2 style={{ marginBottom: '20px', color: 'var(--text-main)', fontSize: '20px' }}>Add Menu Item</h2>
         
         <form onSubmit={handleAddItem} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label className="admin-label">Item Name</label>
-            <input 
-              type="text" 
-              value={newItemName} 
-              onChange={e => setNewItemName(e.target.value)} 
-              className="admin-input" 
-              required
-            />
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
+              <label className="admin-label">Item Name (English)</label>
+              <input 
+                type="text" 
+                value={newItemName} 
+                onChange={e => setNewItemName(e.target.value)} 
+                className="admin-input" 
+                required
+              />
+            </div>
+            {restaurant?.enableAmharic && (
+              <div style={{ flex: 1 }}>
+                <label className="admin-label">Item Name (Amharic)</label>
+                <input 
+                  type="text" 
+                  value={newItemNameAm} 
+                  onChange={e => setNewItemNameAm(e.target.value)} 
+                  className="admin-input" 
+                />
+              </div>
+            )}
           </div>
-          <div>
-            <label className="admin-label">Description</label>
-            <textarea 
-              value={newItemDesc} 
-              onChange={e => setNewItemDesc(e.target.value)} 
-              className="admin-input" 
-              rows={3}
-            />
+          
+          <div style={{ display: 'flex', gap: '16px', flexDirection: restaurant?.enableAmharic ? 'row' : 'column' }}>
+            <div style={{ flex: 1 }}>
+              <label className="admin-label">Description (English)</label>
+              <textarea 
+                value={newItemDesc} 
+                onChange={e => setNewItemDesc(e.target.value)} 
+                className="admin-input" 
+                rows={3}
+              />
+            </div>
+            {restaurant?.enableAmharic && (
+              <div style={{ flex: 1 }}>
+                <label className="admin-label">Description (Amharic)</label>
+                <textarea 
+                  value={newItemDescAm} 
+                  onChange={e => setNewItemDescAm(e.target.value)} 
+                  className="admin-input" 
+                  rows={3}
+                />
+              </div>
+            )}
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <div style={{ flex: 1 }}>

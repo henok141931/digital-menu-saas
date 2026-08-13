@@ -1,0 +1,11 @@
+{
+  "menu": {
+    "searchPlaceholder": "Search menu...",
+    "categories": "Categories",
+    "all": "All",
+    "contact": "Contact",
+    "paymentMethods": "Payment Methods",
+    "social": "Connect with us",
+    "poweredBy": "Powered by"
+  }
+}

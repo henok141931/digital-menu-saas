@@ -4,8 +4,9 @@ import Toast from '../../Toast';
 import ConfirmModal from '../../ConfirmModal';
 import PromptModal from '../../PromptModal';
 
-export default function TaxonomyTab({ menuData, refreshMenu }) {
+export default function TaxonomyTab({ menuData, refreshMenu, restaurant }) {
   const [newCatName, setNewCatName] = useState('');
+  const [newCatNameAm, setNewCatNameAm] = useState('');
   const [isCatSubmitting, setIsCatSubmitting] = useState(false);
   
   const [newTagName, setNewTagName] = useState('');
@@ -27,13 +28,14 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ restaurantId, name: newCatName })
+        body: JSON.stringify({ restaurantId, name: newCatName, nameAm: newCatNameAm })
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || 'Failed to add category');
       }
       setNewCatName('');
+      setNewCatNameAm('');
       Toast.success('Category added');
       refreshMenu();
     } catch (err) {
@@ -129,7 +131,7 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ name: newName })
+        body: JSON.stringify({ name: newName, nameAm: arguments[1] || '' })
       });
       
       if (!res.ok) {
@@ -159,11 +161,21 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
               type="text" 
               value={newCatName} 
               onChange={e => setNewCatName(e.target.value)} 
-              placeholder="e.g. Starters, Mains" 
+              placeholder="e.g. Starters" 
               className="admin-input" 
               style={{ flex: 1 }}
               required 
             />
+            {restaurant?.enableAmharic && (
+              <input 
+                type="text" 
+                value={newCatNameAm} 
+                onChange={e => setNewCatNameAm(e.target.value)} 
+                placeholder="Starters (Amharic)" 
+                className="admin-input" 
+                style={{ flex: 1 }}
+              />
+            )}
             <button type="submit" disabled={isCatSubmitting} className="add-btn primary" style={{ whiteSpace: 'nowrap' }}>
               {isCatSubmitting ? 'Adding...' : 'Add'}
             </button>
@@ -175,7 +187,7 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
                 <span style={{ fontWeight: '500' }}>{cat.name}</span>
                 <div>
                   <button 
-                    onClick={() => setEditItem({ type: 'category', id: cat._id, name: cat.name })} 
+                    onClick={() => setEditItem({ type: 'category', id: cat._id, name: cat.name, nameAm: cat.nameAm })} 
                     style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '4px', marginRight: '8px' }}
                     title="Edit Category"
                   >
@@ -258,6 +270,8 @@ export default function TaxonomyTab({ menuData, refreshMenu }) {
         isOpen={!!editItem}
         title={`Edit ${editItem?.type === 'category' ? 'Category' : 'Tag'}`}
         initialValue={editItem?.name}
+        initialValueAm={editItem?.nameAm}
+        showAmharic={restaurant?.enableAmharic && editItem?.type === 'category'}
         placeholder="Enter new name"
         onConfirm={handleEditConfirm}
         onCancel={() => setEditItem(null)}
