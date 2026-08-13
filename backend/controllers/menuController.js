@@ -206,13 +206,13 @@ export const toggleMenuItemAvailability = async (req, res) => {
 // @route   POST /api/menu/tags
 export const createDietaryTag = async (req, res) => {
   try {
-    const { name, restaurantId } = req.body;
+    const { name, nameAm, restaurantId } = req.body;
     
     if (!name) {
       return res.status(400).json({ message: 'Tag name is required' });
     }
 
-    const newTag = await DietaryTag.create({ name, restaurantId });
+    const newTag = await DietaryTag.create({ name, nameAm, restaurantId });
     res.status(201).json(newTag);
   } catch (error) {
     res.status(500).json({ message: 'Server Error: ' + error.message });
@@ -256,7 +256,7 @@ export const deleteDietaryTag = async (req, res) => {
 export const updateDietaryTag = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, nameAm } = req.body;
 
     const query = { _id: id };
     if (req.user.role !== 'SUPER_ADMIN') {
@@ -270,6 +270,7 @@ export const updateDietaryTag = async (req, res) => {
 
     const oldName = tag.name;
     tag.name = name || tag.name;
+    if (nameAm !== undefined) tag.nameAm = nameAm;
     const updatedTag = await tag.save();
 
     if (oldName !== updatedTag.name) {

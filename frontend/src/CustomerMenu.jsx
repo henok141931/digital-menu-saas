@@ -20,6 +20,7 @@ function CustomerMenu() {
   const { t, i18n } = useTranslation();
   
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterTag, setFilterTag] = useState('All');
   const [activeCategory, setActiveCategory] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -169,6 +170,26 @@ function CustomerMenu() {
         />
       </div>
 
+      {menuData.tags && menuData.tags.length > 0 && (
+        <div className="filter-chips-container" style={{ padding: '0 16px', marginBottom: '16px', display: 'flex', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <button 
+            className={`filter-chip ${filterTag === 'All' ? 'active' : ''}`}
+            onClick={() => setFilterTag('All')}
+          >
+            {i18n.language === 'am' ? 'ሁሉም' : 'All'}
+          </button>
+          {menuData.tags.map(tag => (
+            <button 
+              key={tag._id}
+              className={`filter-chip ${filterTag === tag.name ? 'active' : ''}`}
+              onClick={() => setFilterTag(tag.name)}
+            >
+              {i18n.language === 'am' && tag.nameAm ? tag.nameAm : tag.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {!searchQuery && (
         <div className="category-nav-wrapper">
           <nav className="category-nav" ref={navRef}>
@@ -190,8 +211,9 @@ function CustomerMenu() {
       {menuData.categories.map(cat => {
         const categoryItems = menuData.items.filter(item => {
           const matchCategory = item.categoryId === cat._id;
-          const matchSearch = item.name.toLowerCase().includes(searchLower) || item.description?.toLowerCase().includes(searchLower);
-          return searchQuery ? matchSearch && matchCategory : matchCategory;
+          const matchSearch = !searchQuery || item.name.toLowerCase().includes(searchLower) || item.description?.toLowerCase().includes(searchLower);
+          const matchTag = filterTag === 'All' || (item.dietaryTags && item.dietaryTags.includes(filterTag));
+          return searchQuery ? (matchSearch && matchCategory && matchTag) : (matchCategory && matchTag);
         });
 
         if (categoryItems.length === 0) return null;

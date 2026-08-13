@@ -10,6 +10,7 @@ export default function TaxonomyTab({ menuData, refreshMenu, restaurant }) {
   const [isCatSubmitting, setIsCatSubmitting] = useState(false);
   
   const [newTagName, setNewTagName] = useState('');
+  const [newTagNameAm, setNewTagNameAm] = useState('');
   const [isTagSubmitting, setIsTagSubmitting] = useState(false);
 
   const [deleteItem, setDeleteItem] = useState(null); // { type: 'category' | 'tag', id: string, name: string }
@@ -78,13 +79,14 @@ export default function TaxonomyTab({ menuData, refreshMenu, restaurant }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ restaurantId, name: newTagName })
+        body: JSON.stringify({ restaurantId, name: newTagName, nameAm: newTagNameAm })
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || 'Failed to add tag');
       }
       setNewTagName('');
+      setNewTagNameAm('');
       Toast.success('Tag added');
       refreshMenu();
     } catch (err) {
@@ -211,30 +213,43 @@ export default function TaxonomyTab({ menuData, refreshMenu, restaurant }) {
         {/* Dietary Tags Section */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <h3 style={{ marginBottom: '16px', fontSize: '18px' }}>Dietary Tags</h3>
-          <form onSubmit={handleAddTag} style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+          <form onSubmit={handleAddTag} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
             <input 
               type="text" 
               value={newTagName} 
               onChange={e => setNewTagName(e.target.value)} 
-              placeholder="e.g. Vegan, Gluten-Free" 
+              placeholder="Tag Name (e.g. Vegan, Gluten-Free)" 
               className="admin-input" 
-              style={{ flex: 1 }}
               required 
             />
-            <button type="submit" disabled={isTagSubmitting} className="add-btn primary" style={{ whiteSpace: 'nowrap' }}>
-              {isTagSubmitting ? 'Adding...' : 'Add'}
+            {restaurant?.enableAmharic && (
+              <input 
+                type="text" 
+                value={newTagNameAm} 
+                onChange={e => setNewTagNameAm(e.target.value)} 
+                placeholder="Amharic Translation (Optional)" 
+                className="admin-input" 
+              />
+            )}
+            <button type="submit" disabled={isTagSubmitting} className="add-btn primary" style={{ alignSelf: 'flex-start' }}>
+              {isTagSubmitting ? 'Adding...' : 'Add Tag'}
             </button>
           </form>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {menuData.tags && menuData.tags.length > 0 ? menuData.tags.map(tag => (
               <div key={tag._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                <span className={`dietary-tag ${tag.name.toLowerCase().replace(' ', '-')}`}>
-                  {tag.name}
-                </span>
+                <div>
+                  <span className={`dietary-tag ${tag.name.toLowerCase().replace(' ', '-')}`}>
+                    {tag.name}
+                  </span>
+                  {restaurant?.enableAmharic && tag.nameAm && (
+                    <span style={{ marginLeft: '8px', fontSize: '13px', color: 'var(--text-muted)' }}>({tag.nameAm})</span>
+                  )}
+                </div>
                 <div>
                   <button 
-                    onClick={() => setEditItem({ type: 'tag', id: tag._id, name: tag.name })} 
+                    onClick={() => setEditItem({ type: 'tag', id: tag._id, name: tag.name, nameAm: tag.nameAm || '' })} 
                     style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '4px', marginRight: '8px' }}
                     title="Edit Tag"
                   >

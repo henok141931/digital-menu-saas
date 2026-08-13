@@ -12,6 +12,10 @@ const dietaryTagSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Tag name is required'],
       trim: true,
+    },
+    nameAm: {
+      type: String,
+      trim: true,
     }
   },
   {
