@@ -62,6 +62,11 @@ const restaurantSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    activeTemplate: {
+      type: String,
+      default: 'modern-light', // modern-light, elegant-dark, app-style
+      enum: ['modern-light', 'elegant-dark', 'app-style']
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt dates

@@ -7,6 +7,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
   const [brandColor, setBrandColor] = useState(restaurant?.brandColor || '#3b82f6');
   const [secondaryColor, setSecondaryColor] = useState(restaurant?.secondaryColor || '#1e40af');
   const [coverImageUrl, setCoverImageUrl] = useState(restaurant?.coverImageUrl || '');
+  const [activeTemplate, setActiveTemplate] = useState(restaurant?.activeTemplate || 'modern-light');
   const [isColorSubmitting, setIsColorSubmitting] = useState(false);
 
   const [paymentMethods, setPaymentMethods] = useState(restaurant?.paymentMethods || []);
@@ -45,7 +46,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
 
   const handleColorUpdate = (e) => {
     e.preventDefault();
-    handleUpdateSection('Branding & Features', { brandColor, secondaryColor, coverImageUrl }, setIsColorSubmitting);
+    handleUpdateSection('Branding & Features', { brandColor, secondaryColor, coverImageUrl, activeTemplate }, setIsColorSubmitting);
   };
 
   const handlePaymentUpdate = (e) => {
@@ -83,10 +84,40 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
         
-        {/* Branding */}
+        {/* Branding & Template */}
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 style={{ marginBottom: '20px', fontSize: '18px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>🎨 Branding</h3>
+          <h3 style={{ marginBottom: '20px', fontSize: '18px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>🎨 Branding & Theme</h3>
           <form onSubmit={handleColorUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            
+            <div style={{ marginBottom: '8px' }}>
+              <label className="admin-label">Menu Template</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '8px' }}>
+                {['modern-light', 'elegant-dark', 'app-style'].map(tpl => (
+                  <div 
+                    key={tpl}
+                    onClick={() => setActiveTemplate(tpl)}
+                    style={{
+                      border: activeTemplate === tpl ? '2px solid var(--brand-color)' : '1px solid var(--border-color)',
+                      borderRadius: '8px',
+                      padding: '12px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: activeTemplate === tpl ? 'var(--bg-hover)' : 'transparent'
+                    }}
+                  >
+                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>
+                      {tpl === 'modern-light' && '⚪'}
+                      {tpl === 'elegant-dark' && '⚫'}
+                      {tpl === 'app-style' && '📱'}
+                    </div>
+                    <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
+                      {tpl.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <input type="color" value={brandColor} onChange={e => setBrandColor(e.target.value)} style={{ width: '50px', height: '50px', padding: 0, border: 'none', borderRadius: '8px', cursor: 'pointer' }} />
               <div style={{ flex: 1 }}>

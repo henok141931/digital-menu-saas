@@ -59,7 +59,7 @@ export const updateRestaurantSettings = async (req, res) => {
 
     // Build update object dynamically to only update provided fields
     const updateData = {};
-    const allowedFields = ['brandColor', 'secondaryColor', 'coverImageUrl', 'paymentMethods', 'contactPhone', 'contactEmail', 'socialLinks', 'enableAmharic'];
+    const allowedFields = ['brandColor', 'secondaryColor', 'coverImageUrl', 'paymentMethods', 'contactPhone', 'contactEmail', 'socialLinks', 'enableAmharic', 'activeTemplate'];
     
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {

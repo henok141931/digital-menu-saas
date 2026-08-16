@@ -1,0 +1,192 @@
+/* =======================================
+   MENU TEMPLATES STYLES
+   ======================================= */
+
+/* --- 1. MODERN LIGHT GRID (Ramen Style) --- */
+.template-modern-light {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+.template-modern-light .menu-section > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 0 16px;
+}
+@media (min-width: 600px) {
+  .template-modern-light .menu-section > div { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+.menu-card.tpl-modern-light {
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: none;
+}
+.menu-card.tpl-modern-light .card-image,
+.menu-card.tpl-modern-light .card-image-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border: 4px solid white;
+}
+.menu-card.tpl-modern-light h3 {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: #1e293b;
+}
+.menu-card.tpl-modern-light .desc {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 16px;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.menu-card.tpl-modern-light .price-tag {
+  background: var(--brand-color);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* --- 2. ELEGANT DARK (Fine Dining Style) --- */
+.template-elegant-dark {
+  background-color: #121212;
+  color: #e5e5e5;
+}
+.template-elegant-dark .category-nav-wrapper { background: #121212; border-bottom: 1px solid #333; }
+.template-elegant-dark .category-tab { color: #a3a3a3; }
+.template-elegant-dark .category-title { color: #facc15; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 24px; border: none; }
+.template-elegant-dark .menu-section > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+  padding: 0 16px;
+  padding-top: 20px;
+}
+.menu-card.tpl-elegant-dark {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 0 0 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid #2a2a2a;
+  overflow: hidden;
+  position: relative;
+  margin-top: 40px;
+}
+.menu-card.tpl-elegant-dark .card-image,
+.menu-card.tpl-elegant-dark .card-image-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: -40px;
+  margin-bottom: 16px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  background: #222;
+}
+.menu-card.tpl-elegant-dark h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  color: #fff;
+  padding: 0 12px;
+}
+.menu-card.tpl-elegant-dark .desc {
+  font-size: 11px;
+  color: #888;
+  padding: 0 16px;
+  margin-bottom: 12px;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.menu-card.tpl-elegant-dark .price-tag {
+  font-size: 15px;
+  color: #facc15;
+  margin-top: auto;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+/* --- 3. APP STYLE (Burger App Style) --- */
+.template-app-style {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+.template-app-style .category-nav-wrapper { background: #0f172a; border-bottom-color: #1e293b; }
+.template-app-style .category-tab { color: #94a3b8; }
+.template-app-style .category-title { color: white; }
+.template-app-style .menu-section > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 0 16px;
+}
+.menu-card.tpl-app-style {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #334155;
+}
+.menu-card.tpl-app-style .card-image-wrapper {
+  width: 100%;
+  height: 160px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.menu-card.tpl-app-style .card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+}
+.menu-card.tpl-app-style h3 {
+  font-size: 18px;
+  color: white;
+  margin-bottom: 6px;
+}
+.menu-card.tpl-app-style .desc {
+  color: #94a3b8;
+  margin-bottom: 16px;
+  font-size: 13px;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.menu-card.tpl-app-style .card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+.menu-card.tpl-app-style .price {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--brand-color);
+  background: transparent;
+  padding: 0;
+}

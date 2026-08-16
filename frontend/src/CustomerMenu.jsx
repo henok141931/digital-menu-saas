@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactGA from 'react-ga4';
 import { useTranslation } from 'react-i18next';
 import './CustomerMenuUI.css';
+import './Templates.css';
 
 function CustomerMenu() {
   const { slug } = useParams();
@@ -128,9 +129,11 @@ function CustomerMenu() {
   // Filter items globally by search query
   const searchLower = searchQuery.toLowerCase();
   
+  const activeTemplate = restaurant.activeTemplate || 'modern-light';
+
   return (
     <>
-      <div className="menu-container" style={{ paddingBottom: '100px' }}>
+      <div className={`menu-container template-${activeTemplate}`} style={{ paddingBottom: '100px' }}>
           <header 
             className="customer-hero"
             style={{ 
@@ -235,6 +238,7 @@ function CustomerMenu() {
                   key={item._id} 
                   item={item} 
                   index={index}
+                  template={activeTemplate}
                   onClick={(i) => {
                     setSelectedItem(i);
                     // Track item click event
