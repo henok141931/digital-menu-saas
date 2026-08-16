@@ -20,7 +20,7 @@ function EditItemModal({ item, categories, tags = [], restaurant, onClose, onSav
       setNameAm(item.nameAm || '');
       setDescription(item.description || '');
       setDescriptionAm(item.descriptionAm || '');
-      setPrice(item.price || '');
+      setPrice(item.price !== undefined ? item.price : '');
       setImageUrl(item.imageUrl || '');
       setCategoryId(item.categoryId || '');
       setDietaryTags(item.dietaryTags || []);
@@ -119,6 +119,7 @@ function EditItemModal({ item, categories, tags = [], restaurant, onClose, onSav
               style={{ width: '100%', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-main)' }}
               required
             >
+              <option value="" disabled>Select Category</option>
               {categories.map(cat => (
                 <option key={cat._id} value={cat._id} style={{ color: '#000' }}>{cat.name}</option>
               ))}
