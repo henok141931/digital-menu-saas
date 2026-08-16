@@ -35,20 +35,19 @@ function EditItemModal({ item, categories, tags = [], restaurant, onClose, onSav
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'QR Menu');
+      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
       
-      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-      if (!cloudName) {
-        throw new Error("VITE_CLOUDINARY_CLOUD_NAME is missing in .env!");
-      }
-
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, {
         method: 'POST',
         body: formData
       });
 
-      if (!res.ok) throw new Error('Image upload failed');
       const data = await res.json();
+      if (!res.ok) {
+        console.error("Cloudinary error:", data);
+        throw new Error(data.error?.message || 'Image upload failed');
+      }
+      
       setImageUrl(data.secure_url);
     } catch (err) {
       alert(err.message);
