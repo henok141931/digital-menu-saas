@@ -138,6 +138,26 @@ export default function MenuTab({ menuData, setMenuData, refreshMenu, restaurant
     }
   };
 
+  const handleEditItem = async (id, updatedData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${BASE_URL}/api/menu/items/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedData)
+      });
+      if (!res.ok) throw new Error('Failed to update item');
+      Toast.success('Item updated successfully');
+      setEditingItem(null);
+      refreshMenu();
+    } catch (err) {
+      Toast.error(err.message);
+    }
+  };
+
   const handleAddItem = async (e) => {
     e.preventDefault();
     if (isItemSubmitting) return;
@@ -346,7 +366,7 @@ export default function MenuTab({ menuData, setMenuData, refreshMenu, restaurant
           tags={menuData.tags}
           restaurant={restaurant}
           onClose={() => setEditingItem(null)} 
-          onSave={refreshMenu} 
+          onSave={handleEditItem} 
         />
       )}
 
