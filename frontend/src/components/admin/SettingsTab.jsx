@@ -77,7 +77,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
       // the backend returns { imageUrl: '/uploads/filename.jpg' }
       // we prepend the BASE_URL so it forms a full absolute URL for the frontend
       setCoverImageUrl(`${BASE_URL}${data.imageUrl}`);
-      Toast.success('Image uploaded! Don\\'t forget to click Save.');
+      Toast.success("Image uploaded! Don't forget to click Save.");
     } catch (err) {
       Toast.error(err.message);
     } finally {
