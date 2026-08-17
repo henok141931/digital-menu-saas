@@ -63,27 +63,25 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
 
     setIsUploadingImage(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${BASE_URL}/api/upload`, {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+      
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
         body: formData
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Image upload failed');
+        throw new Error('Image upload to Cloudinary failed');
       }
 
       const data = await res.json();
-      // the backend returns { imageUrl: '/uploads/filename.jpg' }
-      // we prepend the BASE_URL so it forms a full absolute URL for the frontend
-      setCoverImageUrl(`${BASE_URL}${data.imageUrl}`);
+      setCoverImageUrl(data.secure_url);
       Toast.success("Image uploaded! Don't forget to click Save.");
     } catch (err) {
-      Toast.error(err.message);
+      console.error(err);
+      Toast.error('Upload failed');
     } finally {
       setIsUploadingImage(false);
     }
