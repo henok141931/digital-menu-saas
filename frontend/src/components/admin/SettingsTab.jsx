@@ -37,11 +37,12 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
       
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || `Failed to update ${section}`);
+        throw new Error(errorData.message || `ERROR_NO_MESSAGE_PROVIDED_BY_BACKEND: ${section}`);
       }
       Toast.success(`${section} updated successfully`);
       refreshRestaurant();
     } catch (err) {
+      console.error(err);
       Toast.error(err.message);
     } finally {
       setSubmitting(false);
