@@ -9,6 +9,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
   const [coverImageUrl, setCoverImageUrl] = useState(restaurant?.coverImageUrl || '');
   const [activeTemplate, setActiveTemplate] = useState(restaurant?.activeTemplate || 'modern-light');
   const [isColorSubmitting, setIsColorSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const [paymentMethods, setPaymentMethods] = useState(restaurant?.paymentMethods || []);
   const [isPaymentSubmitting, setIsPaymentSubmitting] = useState(false);
@@ -47,6 +48,41 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
   const handleColorUpdate = (e) => {
     e.preventDefault();
     handleUpdateSection('Branding & Features', { brandColor, secondaryColor, coverImageUrl, activeTemplate }, setIsColorSubmitting);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    setIsUploadingImage(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Image upload failed');
+      }
+
+      const data = await res.json();
+      // the backend returns { imageUrl: '/uploads/filename.jpg' }
+      // we prepend the BASE_URL so it forms a full absolute URL for the frontend
+      setCoverImageUrl(`${BASE_URL}${data.imageUrl}`);
+      Toast.success('Image uploaded! Don\\'t forget to click Save.');
+    } catch (err) {
+      Toast.error(err.message);
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const handlePaymentUpdate = (e) => {
@@ -136,8 +172,14 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
 
             <div>
               <label className="admin-label">Cover Image URL</label>
-              <input type="url" value={coverImageUrl} onChange={e => setCoverImageUrl(e.target.value)} className="admin-input" placeholder="https://example.com/image.jpg" />
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Displays at the top of the customer menu</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input type="url" value={coverImageUrl} onChange={e => setCoverImageUrl(e.target.value)} className="admin-input" placeholder="https://example.com/image.jpg" style={{ flex: 1 }} />
+                <label className="add-btn" style={{ background: '#e2e8f0', color: 'var(--text-main)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  {isUploadingImage ? 'Uploading...' : 'Upload Image'}
+                  <input type="file" accept="image/jpeg, image/png, image/webp" onChange={handleImageUpload} style={{ display: 'none' }} disabled={isUploadingImage} />
+                </label>
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Displays at the top of the customer menu. You can paste a link or upload a file.</div>
             </div>
 
             <button type="submit" disabled={isColorSubmitting} className="add-btn primary" style={{ marginTop: '8px' }}>

@@ -10,6 +10,8 @@ import menuRoutes from './routes/menuRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
+import path from 'path';
 
 dotenv.config();
 
@@ -32,6 +34,11 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Make uploads folder statically available
+const __dirname = path.resolve();
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB & Start Server
 mongoose
