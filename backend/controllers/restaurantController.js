@@ -53,8 +53,10 @@ export const updateRestaurantSettings = async (req, res) => {
     const { id } = req.params;
     
     // Check authorization: Must be SUPER_ADMIN or the admin of this specific restaurant
-    if (req.user.role !== 'SUPER_ADMIN' && id !== req.user.restaurantId?.toString()) {
-      return res.status(403).json({ message: 'Not authorized to update this restaurant' });
+    if (req.user.role !== 'SUPER_ADMIN') {
+      if (!req.user.restaurantId || id !== req.user.restaurantId.toString()) {
+        return res.status(403).json({ message: 'Not authorized to update this restaurant' });
+      }
     }
 
     // Build update object dynamically to only update provided fields
@@ -79,6 +81,7 @@ export const updateRestaurantSettings = async (req, res) => {
 
     res.status(200).json(restaurant);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Server Error: ' + error.message });
   }
 };

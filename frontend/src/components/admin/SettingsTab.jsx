@@ -35,7 +35,10 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
         body: JSON.stringify(payload)
       });
       
-      if (!res.ok) throw new Error(`Failed to update ${section}`);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || `Failed to update ${section}`);
+      }
       Toast.success(`${section} updated successfully`);
       refreshRestaurant();
     } catch (err) {
