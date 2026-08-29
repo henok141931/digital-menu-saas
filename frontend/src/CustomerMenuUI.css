@@ -37,10 +37,11 @@
 }
 
 .hero-content h1 {
-  font-size: 28px;
+  font-family: 'Dopestyle', 'Hey August', var(--font-main);
+  font-size: 32px;
   font-weight: 800;
   margin-bottom: 8px;
-  letter-spacing: -0.5px;
+  letter-spacing: 0.5px;
   color: var(--text-main);
   line-height: 1.2;
 }
