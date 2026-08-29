@@ -29,6 +29,46 @@
   --font-hey-august: 'Hey August', 'Outfit', sans-serif;
 }
 
+body.dark-mode, .dark-mode {
+  --bg-main: #0f172a;
+  --bg-card: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+}
+
+/* Force dark mode styling over hardcoded templates when active */
+.dark-mode.menu-container {
+  background-color: var(--bg-main) !important;
+  color: var(--text-main) !important;
+}
+.dark-mode .menu-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+.dark-mode h1, .dark-mode h2, .dark-mode h3 {
+  color: var(--text-main) !important;
+}
+.dark-mode .desc, .dark-mode p {
+  color: var(--text-muted) !important;
+}
+.dark-mode .category-nav-wrapper {
+  background-color: var(--bg-main) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+.dark-mode .category-tab {
+  background-color: var(--bg-card) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
+}
+.dark-mode .category-tab:hover, .dark-mode .category-tab.active {
+  background-color: var(--brand-color) !important;
+  color: white !important;
+}
+.dark-mode .hero-content {
+  background-color: var(--bg-card) !important;
+}
+
 /* Helper classes for the fonts in case they are needed for specific elements */
 .font-dopestyle { font-family: var(--font-dopestyle); }
 .font-hey-august { font-family: var(--font-hey-august); }

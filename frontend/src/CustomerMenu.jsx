@@ -27,6 +27,17 @@ function CustomerMenu() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => {
+      const newMode = !prev;
+      localStorage.setItem('theme', newMode ? 'dark' : 'light');
+      return newMode;
+    });
+  };
 
   // Refs for ScrollSpy
   const categoryRefs = useRef({});
@@ -133,7 +144,7 @@ function CustomerMenu() {
 
   return (
     <>
-      <div className={`menu-container template-${activeTemplate}`} style={{ paddingBottom: '100px' }}>
+      <div className={`menu-container template-${activeTemplate} ${isDarkMode ? 'dark-mode' : ''}`} style={{ paddingBottom: '100px' }}>
           <header 
             className="customer-hero"
             style={{ 
@@ -141,8 +152,21 @@ function CustomerMenu() {
               position: 'relative'
             }}
           >
-            {restaurant.enableAmharic && (
-              <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10 }}>
+            <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 10, display: 'flex', gap: '8px' }}>
+              <button 
+                onClick={toggleDarkMode}
+                style={{ 
+                  background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', 
+                  border: '1px solid rgba(255, 255, 255, 0.3)', color: 'white', 
+                  width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+                aria-label="Toggle dark mode"
+              >
+                <i className={`fa-solid ${isDarkMode ? 'fa-sun' : 'fa-moon'}`}></i>
+              </button>
+
+              {restaurant.enableAmharic && (
                 <button 
                   onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'am' : 'en')}
                   style={{ 
@@ -154,8 +178,8 @@ function CustomerMenu() {
                 >
                   <i className="fa-solid fa-globe"></i> {i18n.language === 'en' ? 'አማርኛ' : 'English'}
                 </button>
-              </div>
-            )}
+              )}
+            </div>
             
             {restaurant.coverImageUrl && <div className="hero-overlay"></div>}
             <div className="hero-content">
