@@ -55,6 +55,7 @@
 
 /* Snap-Scroll Category Navigation */
 .category-nav-wrapper {
+  position: -webkit-sticky; /* iOS Safari Support */
   position: sticky;
   top: 0;
   background: var(--bg-main, #f8fafc);

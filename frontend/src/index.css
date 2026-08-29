@@ -1,3 +1,23 @@
+@font-face {
+  font-family: 'Dopstyle';
+  src: url('/fonts/dopstyle.woff2') format('woff2'),
+       url('/fonts/dopstyle.woff') format('woff'),
+       url('/fonts/dopstyle.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hey August';
+  src: url('/fonts/hey-august.woff2') format('woff2'),
+       url('/fonts/hey-august.woff') format('woff'),
+       url('/fonts/hey-august.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg-main: #f8fafc;
   --bg-card: #ffffff;
@@ -7,8 +27,13 @@
   --secondary-color: #1e40af; /* Fallback secondary color */
   --border-color: #e2e8f0;
   
-  --font-main: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-main: 'Dopstyle', 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-accent: 'Hey August', 'Outfit', system-ui, -apple-system, sans-serif;
 }
+
+/* Helper classes for the fonts in case they are needed for specific elements */
+.font-dopstyle { font-family: var(--font-main); }
+.font-hey-august { font-family: var(--font-accent); }
 
 * {
   box-sizing: border-box;
@@ -22,6 +47,10 @@ body {
   color: var(--text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-accent);
 }
 
 /* Animations */
