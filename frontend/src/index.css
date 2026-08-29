@@ -1,8 +1,6 @@
 @font-face {
-  font-family: 'Dopstyle';
-  src: url('/fonts/dopstyle.woff2') format('woff2'),
-       url('/fonts/dopstyle.woff') format('woff'),
-       url('/fonts/dopstyle.ttf') format('truetype');
+  font-family: 'Dopestyle';
+  src: url('/fonts/dopestyle.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -10,8 +8,7 @@
 
 @font-face {
   font-family: 'Hey August';
-  src: url('/fonts/hey-august.woff2') format('woff2'),
-       url('/fonts/hey-august.woff') format('woff'),
+  src: url('/fonts/hey-august.otf') format('opentype'),
        url('/fonts/hey-august.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
