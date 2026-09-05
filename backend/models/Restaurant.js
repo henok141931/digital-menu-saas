@@ -19,6 +19,14 @@ const restaurantSchema = new mongoose.Schema(
       type: String,
       default: '#1e40af', // Default darker blue
     },
+    primaryFont: {
+      type: String,
+      default: 'Outfit',
+    },
+    secondaryFont: {
+      type: String,
+      default: 'Outfit',
+    },
     viewCount: {
       type: Number,
       default: 0,

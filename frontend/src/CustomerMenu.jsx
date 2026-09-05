@@ -62,6 +62,12 @@ function CustomerMenu() {
       if (restaurantData.secondaryColor) {
         document.documentElement.style.setProperty('--secondary-color', restaurantData.secondaryColor);
       }
+      if (restaurantData.primaryFont) {
+        document.documentElement.style.setProperty('--font-primary', `"${restaurantData.primaryFont}", sans-serif`);
+      }
+      if (restaurantData.secondaryFont) {
+        document.documentElement.style.setProperty('--font-secondary', `"${restaurantData.secondaryFont}", sans-serif`);
+      }
 
       // 2. Fetch Menu using restaurantId
       const menuRes = await fetch(`${BASE_URL}/api/menu/${restaurantData._id}`);

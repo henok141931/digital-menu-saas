@@ -7,13 +7,13 @@ import './components/admin/AdminLayout.css';
 import './App.css';
 
 function SuperAdminDashboard() {
-  const [restaurants, setRestaurants] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
-  const [activeTab, setActiveTab] = useState('restaurants');
-
   const navigate = useNavigate();
+  const [restaurants, setRestaurants] = useState([]);
+  const [activeTab, setActiveTab] = useState('restaurants');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
 
@@ -48,25 +48,40 @@ function SuperAdminDashboard() {
     navigate('/login');
   };
 
+  const handleTabClick = (tabId) => {
+    setActiveTab(tabId);
+    setIsSidebarOpen(false);
+  };
+
   return (
     <div className="admin-layout">
+      {isSidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setIsSidebarOpen(false)}></div>
+      )}
+
       {/* Sidebar Navigation */}
-      <aside className={`admin-sidebar open`}>
+      <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h2>Super Admin</h2>
+          <span className="badge">System</span>
+          <button className="close-sidebar-btn" onClick={() => setIsSidebarOpen(false)}>
+            <i className="fa-solid fa-times"></i>
+          </button>
         </div>
         <nav className="sidebar-nav">
           <button 
-            className={`nav-btn ${activeTab === 'restaurants' ? 'active' : ''}`}
-            onClick={() => setActiveTab('restaurants')}
+            className={`nav-item ${activeTab === 'restaurants' ? 'active' : ''}`}
+            onClick={() => handleTabClick('restaurants')}
           >
-            <i className="fa-solid fa-store"></i> Restaurants
+            <span className="nav-icon"><i className="fa-solid fa-chart-line"></i></span>
+            <span className="nav-label">Platform Overview</span>
           </button>
           <button 
-            className={`nav-btn ${activeTab === 'accounts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('accounts')}
+            className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`}
+            onClick={() => handleTabClick('accounts')}
           >
-            <i className="fa-solid fa-users"></i> Accounts
+            <span className="nav-icon"><i className="fa-solid fa-users-gear"></i></span>
+            <span className="nav-label">Account Management</span>
           </button>
         </nav>
         <div className="sidebar-footer">
@@ -78,6 +93,18 @@ function SuperAdminDashboard() {
 
       {/* Main Content Area */}
       <main className="admin-main">
+        <header className="mobile-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>
+              <i className="fa-solid fa-bars"></i>
+            </button>
+            <h2>Super Admin</h2>
+          </div>
+          <button className="logout-btn-mobile" onClick={handleLogout}>
+             <i className="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </header>
+
         <header className="admin-topbar">
           <div className="topbar-title">
             <h1>{activeTab === 'restaurants' ? 'Platform Overview' : 'Account Management'}</h1>

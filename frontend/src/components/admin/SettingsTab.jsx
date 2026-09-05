@@ -8,6 +8,8 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
   const [secondaryColor, setSecondaryColor] = useState(restaurant?.secondaryColor || '#1e40af');
   const [coverImageUrl, setCoverImageUrl] = useState(restaurant?.coverImageUrl || '');
   const [activeTemplate, setActiveTemplate] = useState(restaurant?.activeTemplate || 'modern-light');
+  const [primaryFont, setPrimaryFont] = useState(restaurant?.primaryFont || 'Outfit');
+  const [secondaryFont, setSecondaryFont] = useState(restaurant?.secondaryFont || 'Outfit');
   const [isColorSubmitting, setIsColorSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
@@ -51,7 +53,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
 
   const handleColorUpdate = (e) => {
     e.preventDefault();
-    handleUpdateSection('Branding & Features', { brandColor, secondaryColor, coverImageUrl, activeTemplate }, setIsColorSubmitting);
+    handleUpdateSection('Branding & Features', { brandColor, secondaryColor, coverImageUrl, activeTemplate, primaryFont, secondaryFont }, setIsColorSubmitting);
   };
 
   const handleImageUpload = async (e) => {
@@ -169,6 +171,43 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
               <div style={{ flex: 1 }}>
                 <label className="admin-label">Secondary Color</label>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Used for accents and gradients</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '16px', flexDirection: 'column' }}>
+              <div>
+                <label className="admin-label">Primary Font (Headings)</label>
+                <select value={primaryFont} onChange={e => setPrimaryFont(e.target.value)} className="admin-input">
+                  <option value="Outfit">Outfit</option>
+                  <option value="Roboto">Roboto</option>
+                  <option value="Open Sans">Open Sans</option>
+                  <option value="Lato">Lato</option>
+                  <option value="Montserrat">Montserrat</option>
+                  <option value="Poppins">Poppins</option>
+                  <option value="Playfair Display">Playfair Display</option>
+                  <option value="Merriweather">Merriweather</option>
+                  <option value="Lora">Lora</option>
+                  <option value="Nunito">Nunito</option>
+                  <option value="Dopestyle">Dopestyle</option>
+                  <option value="Hey August">Hey August</option>
+                </select>
+              </div>
+              <div>
+                <label className="admin-label">Secondary Font (Body Text)</label>
+                <select value={secondaryFont} onChange={e => setSecondaryFont(e.target.value)} className="admin-input">
+                  <option value="Outfit">Outfit</option>
+                  <option value="Roboto">Roboto</option>
+                  <option value="Open Sans">Open Sans</option>
+                  <option value="Lato">Lato</option>
+                  <option value="Montserrat">Montserrat</option>
+                  <option value="Poppins">Poppins</option>
+                  <option value="Playfair Display">Playfair Display</option>
+                  <option value="Merriweather">Merriweather</option>
+                  <option value="Lora">Lora</option>
+                  <option value="Nunito">Nunito</option>
+                  <option value="Dopestyle">Dopestyle</option>
+                  <option value="Hey August">Hey August</option>
+                </select>
               </div>
             </div>
 

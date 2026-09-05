@@ -37,7 +37,7 @@
 }
 
 .hero-content h1 {
-  font-family: 'Dopestyle', 'Hey August', var(--font-main);
+  font-family: var(--font-primary, var(--font-main));
   font-size: 32px;
   font-weight: 800;
   margin-bottom: 8px;
@@ -58,9 +58,9 @@
 .category-nav-wrapper {
   position: -webkit-sticky; /* iOS Safari Support */
   position: sticky;
-  top: 0;
+  top: -1px;
   background: var(--bg-main, #f8fafc);
-  z-index: 20;
+  z-index: 100;
   padding: 12px 0;
   margin: 0 -24px 16px -24px; /* break out of padding */
   box-shadow: 0 4px 12px -8px rgba(0,0,0,0.1);
