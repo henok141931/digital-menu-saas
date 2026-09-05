@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BASE_URL } from '../../config';
 import Toast from '../../Toast';
 import ConfirmModal from '../../ConfirmModal';
+import BaseModal from '../../BaseModal';
 
 export default function SuperAdminRestaurantsTab({ restaurants, setRestaurants, fetchRestaurants }) {
   const [newRestName, setNewRestName] = useState('');
@@ -12,6 +13,13 @@ export default function SuperAdminRestaurantsTab({ restaurants, setRestaurants, 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  
+  // Edit State
+  const [editingRestaurant, setEditingRestaurant] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editSlug, setEditSlug] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
   const [toast, setToast] = useState({ message: '', type: 'success' });
   const showToast = (message, type = 'success') => setToast({ message, type });
@@ -76,6 +84,46 @@ export default function SuperAdminRestaurantsTab({ restaurants, setRestaurants, 
       showToast(err.message, 'error');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const openEditModal = (rest) => {
+    setEditingRestaurant(rest);
+    setEditName(rest.name || '');
+    setEditSlug(rest.slug || '');
+    setEditDesc(rest.description || '');
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingRestaurant) return;
+    setIsEditSubmitting(true);
+    try {
+      const res = await fetch(`${BASE_URL}/api/restaurants/${editingRestaurant._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: editName,
+          slug: editSlug,
+          description: editDesc
+        })
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to update restaurant');
+      }
+
+      showToast('Restaurant updated successfully!');
+      setEditingRestaurant(null);
+      fetchRestaurants();
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setIsEditSubmitting(false);
     }
   };
 
@@ -224,6 +272,13 @@ export default function SuperAdminRestaurantsTab({ restaurants, setRestaurants, 
                     </td>
                     <td style={{ padding: '16px', textAlign: 'right' }}>
                       <button 
+                        onClick={() => openEditModal(rest)} 
+                        style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '8px', fontSize: '18px', borderRadius: '4px', transition: 'background-color 0.2s', marginRight: '8px' }}
+                        title="Edit Restaurant"
+                      >
+                        <i className="fa-solid fa-pen"></i>
+                      </button>
+                      <button 
                         onClick={() => setDeleteId(rest._id)} 
                         style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px', fontSize: '18px', borderRadius: '4px', transition: 'background-color 0.2s' }}
                         title="Delete Restaurant"
@@ -253,6 +308,53 @@ export default function SuperAdminRestaurantsTab({ restaurants, setRestaurants, 
           onConfirm={handleDeleteRestaurant}
           onCancel={() => setDeleteId(null)}
         />
+      )}
+
+      {editingRestaurant && (
+        <BaseModal isOpen={true} onClose={() => setEditingRestaurant(null)}>
+          <div style={{ padding: '24px' }}>
+            <h2 style={{ marginBottom: '16px', fontSize: '20px' }}>Edit Restaurant</h2>
+            <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label className="admin-label">Restaurant Name</label>
+                <input 
+                  type="text" 
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="admin-input" 
+                  required 
+                />
+              </div>
+              <div>
+                <label className="admin-label">URL Slug</label>
+                <input 
+                  type="text" 
+                  value={editSlug}
+                  onChange={(e) => setEditSlug(e.target.value)}
+                  className="admin-input" 
+                  required 
+                />
+              </div>
+              <div>
+                <label className="admin-label">Description</label>
+                <textarea 
+                  value={editDesc}
+                  onChange={(e) => setEditDesc(e.target.value)}
+                  className="admin-input" 
+                  rows="3"
+                ></textarea>
+              </div>
+              <button 
+                type="submit" 
+                className="add-btn primary" 
+                disabled={isEditSubmitting}
+                style={{ alignSelf: 'flex-end', minWidth: '120px' }}
+              >
+                {isEditSubmitting ? 'Saving...' : 'Save Changes'}
+              </button>
+            </form>
+          </div>
+        </BaseModal>
       )}
     </div>
   );
