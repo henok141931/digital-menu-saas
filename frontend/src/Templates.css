@@ -255,6 +255,9 @@
 .template-lantika .menu-section {
   padding-bottom: 40px;
 }
+.template-lantika .category-title {
+  color: var(--lantika-text-primary);
+}
 .template-lantika .menu-section > div {
   display: flex;
   flex-direction: column;
