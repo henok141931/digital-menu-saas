@@ -7,6 +7,7 @@ export default function OverviewTab({ restaurant, menuData, feedbacks }) {
   if (!restaurant) return null;
 
   const totalScans = restaurant.viewCount || 0;
+  const uniqueScans = restaurant.uniqueViewCount || 0;
   const itemCount = menuData.items.length || 0;
   const categoryCount = menuData.categories.length || 0;
   
@@ -49,8 +50,12 @@ export default function OverviewTab({ restaurant, menuData, feedbacks }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
         {/* Stat Cards */}
         <div className="stat-card">
-          <div className="stat-label">Total QR Scans</div>
+          <div className="stat-label">Total Scans</div>
           <div className="stat-value">{totalScans}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Unique Visitors</div>
+          <div className="stat-value">{uniqueScans}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Average Rating</div>

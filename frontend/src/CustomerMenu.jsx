@@ -49,8 +49,20 @@ function CustomerMenu() {
 
   const fetchRestaurantAndMenu = async () => {
     try {
+      const targetSlug = slug || 'demo';
+      
+      // Check if user has visited this specific restaurant before
+      const visitorKey = `hasVisited_${targetSlug}`;
+      const hasVisited = localStorage.getItem(visitorKey);
+      let isNewVisitor = false;
+      
+      if (!hasVisited) {
+        isNewVisitor = true;
+        localStorage.setItem(visitorKey, 'true');
+      }
+
       // 1. Fetch Restaurant by slug
-      const resRes = await fetch(`${BASE_URL}/api/restaurants/${slug || 'demo'}`);
+      const resRes = await fetch(`${BASE_URL}/api/restaurants/${targetSlug}?isNewVisitor=${isNewVisitor}`);
       if (!resRes.ok) throw new Error('Restaurant not found');
       const restaurantData = await resRes.json();
       setRestaurant(restaurantData);

@@ -31,6 +31,10 @@ const restaurantSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    uniqueViewCount: {
+      type: Number,
+      default: 0,
+    },
     paymentMethods: [
       {
         name: { type: String, required: true },

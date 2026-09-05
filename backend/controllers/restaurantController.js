@@ -30,9 +30,16 @@ export const createRestaurant = async (req, res) => {
 // @route   GET /api/restaurants/:slug
 export const getRestaurantBySlug = async (req, res) => {
   try {
+    const isNewVisitor = req.query.isNewVisitor === 'true';
+    const incQuery = { viewCount: 1 };
+    
+    if (isNewVisitor) {
+      incQuery.uniqueViewCount = 1;
+    }
+
     const restaurant = await Restaurant.findOneAndUpdate(
       { slug: req.params.slug, isActive: true },
-      { $inc: { viewCount: 1 } },
+      { $inc: incQuery },
       { new: true }
     );
 
