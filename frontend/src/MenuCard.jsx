@@ -78,6 +78,27 @@ export default function MenuCard({ item, onClick, index = 0, template = 'modern-
     );
   }
 
+  if (template === 'lantika') {
+    return (
+      <motion.div {...cardProps}>
+        {outOfStockBadge}
+        {item.imageUrl && (
+          <div className="card-image-wrapper">
+            <img src={item.imageUrl} alt={displayName} className="card-image" loading="lazy" />
+          </div>
+        )}
+        <div className="card-content">
+          <div className="title-price-row">
+            <h3>{displayName}</h3>
+            <span className="price">{item.price} {item.currency || 'ETB'}</span>
+          </div>
+          {displayDesc && <p className="desc">{displayDesc}</p>}
+          {dietaryTags}
+        </div>
+      </motion.div>
+    );
+  }
+
   // Fallback / Classic
   return (
     <motion.div {...cardProps}>

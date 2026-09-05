@@ -190,3 +190,182 @@
   background: transparent;
   padding: 0;
 }
+
+/* --- 4. LANTIKA (Premium Ethiopian Night) --- */
+.template-lantika {
+  --lantika-bg: #080808;
+  --lantika-surface: #191919;
+  --lantika-surface-secondary: #22201B;
+  --lantika-border: rgba(255, 255, 255, 0.10);
+  --lantika-border-gold: rgba(201, 168, 105, 0.45);
+
+  --lantika-text-primary: #F5F5F2;
+  --lantika-text-secondary: #B8B5AE;
+  --lantika-text-muted: rgba(245, 245, 242, 0.55);
+
+  --lantika-gold: #C9A869;
+  --lantika-gold-light: #D9BA7A;
+  --lantika-gold-dark: #8F743F;
+
+  --lantika-button-bg: #29261F;
+  --lantika-button-text: #D9BA7A;
+}
+
+/* Header Overrides */
+.template-lantika.menu-container {
+  background-color: var(--lantika-bg);
+  min-height: 100vh;
+}
+.template-lantika .customer-hero {
+  background-color: var(--lantika-bg) !important;
+  border-bottom: 1px solid var(--lantika-border);
+}
+.template-lantika .hero-content h1 {
+  font-family: Georgia, "Times New Roman", serif !important;
+  color: var(--lantika-text-primary) !important;
+  font-weight: 500;
+}
+.template-lantika .hero-content p {
+  color: var(--lantika-gold) !important;
+  font-size: 14px;
+}
+
+/* Category Navigation Overrides */
+.template-lantika .category-nav-wrapper {
+  background-color: var(--lantika-bg) !important;
+  border-bottom: 1px solid var(--lantika-border) !important;
+  box-shadow: none !important;
+}
+.template-lantika .category-tab {
+  background: transparent !important;
+  color: var(--lantika-text-secondary) !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  padding: 12px 16px !important;
+  font-size: 16px;
+  font-weight: 500;
+}
+.template-lantika .category-tab.active {
+  color: var(--lantika-gold) !important;
+  border-bottom: 2px solid var(--lantika-gold) !important;
+}
+
+/* Section & Layout Overrides */
+.template-lantika .menu-section {
+  padding-bottom: 40px;
+}
+.template-lantika .menu-section > div {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0 16px;
+}
+@media (min-width: 768px) {
+  .template-lantika .menu-section > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+  }
+}
+
+/* Card Design Overrides */
+.template-lantika .menu-card.tpl-lantika {
+  background: var(--lantika-surface) !important;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid var(--lantika-border) !important;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-shadow: none;
+  text-align: left;
+}
+.template-lantika .menu-card.tpl-lantika .card-image-wrapper {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+.template-lantika .menu-card.tpl-lantika .card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 28px 28px 0 0;
+}
+.template-lantika .menu-card.tpl-lantika .card-content {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Price & Title Layout */
+.template-lantika .menu-card.tpl-lantika .title-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.template-lantika .menu-card.tpl-lantika h3 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--lantika-text-primary);
+  margin: 0;
+}
+.template-lantika .menu-card.tpl-lantika .price {
+  background: var(--lantika-button-bg);
+  color: var(--lantika-button-text);
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.template-lantika .menu-card.tpl-lantika .desc {
+  color: var(--lantika-text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* Search bar override */
+.template-lantika .search-input {
+  background: var(--lantika-surface);
+  border: 1px solid var(--lantika-border);
+  color: var(--lantika-text-primary);
+}
+.template-lantika .search-input::placeholder {
+  color: var(--lantika-text-secondary);
+}
+.template-lantika .filter-btn {
+  background: var(--lantika-surface) !important;
+  border: 1px solid var(--lantika-border) !important;
+  color: var(--lantika-gold) !important;
+}
+
+/* Modal styling for Lantika */
+.template-lantika .modal-content {
+  background: var(--lantika-surface);
+  color: var(--lantika-text-primary);
+  border: 1px solid var(--lantika-border);
+}
+.template-lantika .close-btn {
+  background: var(--lantika-button-bg);
+  color: var(--lantika-text-primary);
+}
+
+
+/* Button Overrides */
+.template-lantika .add-btn,
+.template-lantika .checkout-btn,
+.template-lantika button.primary {
+  background: var(--lantika-button-bg) !important;
+  color: var(--lantika-button-text) !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--lantika-border-gold) !important;
+}
+.template-lantika .hero-content {
+  background-color: var(--lantika-bg) !important;
+}
+

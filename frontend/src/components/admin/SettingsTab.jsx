@@ -131,8 +131,8 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
             
             <div style={{ marginBottom: '8px' }}>
               <label className="admin-label">Menu Template</label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '8px' }}>
-                {['modern-light', 'elegant-dark', 'app-style'].map(tpl => (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginTop: '8px' }}>
+                {['modern-light', 'elegant-dark', 'app-style', 'lantika'].map(tpl => (
                   <div 
                     key={tpl}
                     onClick={() => setActiveTemplate(tpl)}
@@ -149,6 +149,7 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
                       {tpl === 'modern-light' && '⚪'}
                       {tpl === 'elegant-dark' && '⚫'}
                       {tpl === 'app-style' && '📱'}
+                      {tpl === 'lantika' && '✨'}
                     </div>
                     <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
                       {tpl.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
