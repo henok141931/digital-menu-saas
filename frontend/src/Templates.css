@@ -421,3 +421,33 @@
   border-radius: 999px !important;
   border: 1px solid var(--lantika-border-gold) !important;
 }
+
+/* Location Section overrides for Lantika */
+.template-lantika .visit-us-section {
+  padding: 0 16px 32px 16px;
+}
+.template-lantika .visit-us-card {
+  background: var(--lantika-surface);
+  border-color: var(--lantika-border);
+}
+.template-lantika .visit-us-card h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--lantika-gold);
+  font-weight: normal;
+  font-size: 24px;
+}
+.template-lantika .location-info {
+  color: var(--lantika-text-secondary);
+}
+.template-lantika .location-info i {
+  color: var(--lantika-gold);
+}
+.template-lantika .directions-btn {
+  background: var(--lantika-button-bg);
+  color: var(--lantika-gold);
+  border: 1px solid var(--lantika-border-gold);
+}
+.template-lantika .map-container iframe {
+  filter: invert(90%) hue-rotate(180deg) grayscale(50%);
+}
+

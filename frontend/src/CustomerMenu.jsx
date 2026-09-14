@@ -314,6 +314,54 @@ function CustomerMenu() {
         </div>
       )}
 
+      {/* Location / Visit Us Block */}
+      {(restaurant.address || restaurant.googleMapsUrl || restaurant.operatingHours) && (
+        <section className="visit-us-section">
+          <div className="visit-us-card">
+            <h2>{i18n.language === 'am' ? 'አድራሻ' : 'Visit Us'}</h2>
+            
+            {restaurant.address && (
+              <div className="location-info">
+                <i className="fa-solid fa-location-dot"></i>
+                <p>{restaurant.address}</p>
+              </div>
+            )}
+            
+            {restaurant.operatingHours && (
+              <div className="location-info">
+                <i className="fa-regular fa-clock"></i>
+                <p>{restaurant.operatingHours}</p>
+              </div>
+            )}
+
+            {restaurant.address && (
+              <div className="map-container">
+                <iframe 
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(restaurant.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`} 
+                  width="100%" 
+                  height="200" 
+                  frameBorder="0" 
+                  allowFullScreen 
+                  aria-hidden="false" 
+                  tabIndex="0"
+                ></iframe>
+              </div>
+            )}
+
+            {restaurant.googleMapsUrl && (
+              <a 
+                href={restaurant.googleMapsUrl} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="directions-btn"
+              >
+                Get Directions
+              </a>
+            )}
+          </div>
+        </section>
+      )}
+
       <div className="fab-container">
         {restaurant.paymentMethods && restaurant.paymentMethods.length > 0 && (
           <button onClick={() => setShowPaymentModal(true)} className="fab-btn secondary">

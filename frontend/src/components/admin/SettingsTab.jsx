@@ -23,6 +23,11 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
   const [socialLinks, setSocialLinks] = useState(restaurant?.socialLinks || { facebook: '', instagram: '', telegram: '', tiktok: '' });
   const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
 
+  const [address, setAddress] = useState(restaurant?.address || '');
+  const [googleMapsUrl, setGoogleMapsUrl] = useState(restaurant?.googleMapsUrl || '');
+  const [operatingHours, setOperatingHours] = useState(restaurant?.operatingHours || '');
+  const [isLocationSubmitting, setIsLocationSubmitting] = useState(false);
+
   const handleUpdateSection = async (section, payload, setSubmitting) => {
     setSubmitting(true);
     try {
@@ -97,6 +102,11 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
   const handleContactUpdate = (e) => {
     e.preventDefault();
     handleUpdateSection('Contact Info', { contactPhone, contactEmail }, setIsContactSubmitting);
+  };
+
+  const handleLocationUpdate = (e) => {
+    e.preventDefault();
+    handleUpdateSection('Location & Hours', { address, googleMapsUrl, operatingHours }, setIsLocationSubmitting);
   };
 
   const handleSocialUpdate = (e) => {
@@ -244,6 +254,28 @@ export default function SettingsTab({ restaurant, refreshRestaurant }) {
             </div>
             <button type="submit" disabled={isContactSubmitting} className="add-btn primary" style={{ marginTop: '8px' }}>
               {isContactSubmitting ? 'Saving...' : 'Save Contact'}
+            </button>
+          </form>
+        </div>
+
+        {/* Location & Hours */}
+        <div className="glass-panel" style={{ padding: '24px' }}>
+          <h3 style={{ marginBottom: '20px', fontSize: '18px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>📍 Location & Hours</h3>
+          <form onSubmit={handleLocationUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label className="admin-label">Physical Address</label>
+              <textarea value={address} onChange={e => setAddress(e.target.value)} className="admin-input" placeholder="e.g. 123 Atlas Road, Addis Ababa" rows="2" style={{ resize: 'vertical' }}></textarea>
+            </div>
+            <div>
+              <label className="admin-label">Operating Hours</label>
+              <input type="text" value={operatingHours} onChange={e => setOperatingHours(e.target.value)} className="admin-input" placeholder="e.g. Mon-Sun: 10:00 AM - 11:00 PM" />
+            </div>
+            <div>
+              <label className="admin-label">Google Maps Link</label>
+              <input type="url" value={googleMapsUrl} onChange={e => setGoogleMapsUrl(e.target.value)} className="admin-input" placeholder="https://maps.google.com/..." />
+            </div>
+            <button type="submit" disabled={isLocationSubmitting} className="add-btn primary" style={{ marginTop: '8px' }}>
+              {isLocationSubmitting ? 'Saving...' : 'Save Location'}
             </button>
           </form>
         </div>

@@ -49,6 +49,9 @@ const restaurantSchema = new mongoose.Schema(
       telegram: { type: String, default: '' },
       tiktok: { type: String, default: '' }
     },
+    address: { type: String, default: '' },
+    googleMapsUrl: { type: String, default: '' },
+    operatingHours: { type: String, default: '' },
     slug: {
       type: String,
       required: [true, 'URL slug is required'],
