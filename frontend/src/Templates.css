@@ -230,11 +230,11 @@
 .template-lantika .hero-content {
   background: transparent !important;
   box-shadow: none !important;
-  top: 50%;
-  transform: translateY(-50%);
-  bottom: auto;
+  top: auto;
+  bottom: 0;
+  transform: none;
   border-radius: 0;
-  padding: 0 20px;
+  padding: 0 20px 24px 20px;
 }
 .template-lantika .lantika-motif {
   color: var(--lantika-gold);
@@ -370,6 +370,7 @@
 .template-lantika .search-container {
   padding: 0 16px;
   margin-bottom: 24px;
+  background-color: var(--lantika-bg) !important;
 }
 .template-lantika .search-input {
   background: #1e1e1e !important;
@@ -419,7 +420,3 @@
   border-radius: 999px !important;
   border: 1px solid var(--lantika-border-gold) !important;
 }
-.template-lantika .hero-content {
-  background-color: var(--lantika-bg) !important;
-}
-
