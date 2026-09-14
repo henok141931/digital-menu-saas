@@ -268,7 +268,7 @@ function CustomerMenu() {
       {menuData.categories.map(cat => {
         const categoryItems = menuData.items.filter(item => {
           const matchCategory = item.categoryId === cat._id;
-          const matchSearch = !searchQuery || item.name.toLowerCase().includes(searchLower) || item.description?.toLowerCase().includes(searchLower);
+          const matchSearch = !searchQuery || item.name.toLowerCase().includes(searchLower) || (item.description || '').toLowerCase().includes(searchLower);
           const matchTag = filterTag === 'All' || (item.dietaryTags && item.dietaryTags.includes(filterTag));
           return searchQuery ? (matchSearch && matchCategory && matchTag) : (matchCategory && matchTag);
         });

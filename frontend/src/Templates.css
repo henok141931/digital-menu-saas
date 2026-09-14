@@ -388,6 +388,7 @@
   color: #888;
   z-index: 5;
   font-size: 14px;
+  pointer-events: none;
 }
 .template-lantika .search-input::placeholder {
   color: #888;

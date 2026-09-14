@@ -51,6 +51,7 @@
   color: var(--text-muted);
   font-size: 15px;
   z-index: 5;
+  pointer-events: none;
 }
 
 .search-input:focus {
