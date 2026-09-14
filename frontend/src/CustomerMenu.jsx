@@ -201,20 +201,28 @@ function CustomerMenu() {
             
             {restaurant.coverImageUrl && <div className="hero-overlay"></div>}
             <div className="hero-content">
+              {activeTemplate === 'lantika' && (
+                <div className="lantika-motif">❖</div>
+              )}
               <h1>{restaurant.name}</h1>
+              {activeTemplate === 'lantika' && (
+                <div className="lantika-separator"></div>
+              )}
               <p>{restaurant.description || 'Welcome to our menu'}</p>
             </div>
           </header>
 
       <div className="search-container" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <input 
-          type="text" 
-          placeholder={t('menu.searchPlaceholder')}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-input"
-          style={{ flex: 1 }}
-        />
+        <div className="search-input-wrapper" style={{ position: 'relative', flex: 1 }}>
+          <i className="fa-solid fa-magnifying-glass search-icon"></i>
+          <input 
+            type="text" 
+            placeholder={t('menu.searchPlaceholder')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
         {menuData.tags && menuData.tags.length > 0 && (
           <button 
             className="filter-btn"
