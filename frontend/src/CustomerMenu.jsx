@@ -145,9 +145,30 @@ function CustomerMenu() {
     setActiveCategory(categoryId);
     const el = categoryRefs.current[categoryId];
     if (el) {
-      // Offset by roughly the height of the sticky nav and search bar
-      const y = el.getBoundingClientRect().top + window.scrollY - 130;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const targetY = el.getBoundingClientRect().top + window.scrollY - 130;
+      const startY = window.scrollY;
+      const distance = targetY - startY;
+      const duration = 600; // 600ms for a slower, more natural transition
+      let start = null;
+
+      const step = (timestamp) => {
+        if (!start) start = timestamp;
+        const progress = timestamp - start;
+        const percent = Math.min(progress / duration, 1);
+        
+        // easeInOutCubic for a smooth acceleration and deceleration
+        const ease = percent < 0.5 
+          ? 4 * percent * percent * percent 
+          : 1 - Math.pow(-2 * percent + 2, 3) / 2;
+          
+        window.scrollTo(0, startY + distance * ease);
+        
+        if (progress < duration) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      
+      window.requestAnimationFrame(step);
     }
   };
 
