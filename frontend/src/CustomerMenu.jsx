@@ -145,10 +145,18 @@ function CustomerMenu() {
     setActiveCategory(categoryId);
     const el = categoryRefs.current[categoryId];
     if (el) {
+      // Clear any ongoing scroll animation if they click quickly
+      if (window.currentScrollAnim) {
+        cancelAnimationFrame(window.currentScrollAnim);
+      }
+
       const targetY = el.getBoundingClientRect().top + window.scrollY - 130;
       const startY = window.scrollY;
       const distance = targetY - startY;
-      const duration = 600; // 600ms for a slower, more natural transition
+      
+      // Calculate dynamic duration based on how far we have to scroll.
+      // Minimum 800ms, max 1500ms (1.5 seconds) for a very relaxed, smooth pan.
+      const duration = Math.max(800, Math.min(Math.abs(distance) * 0.6, 1500));
       let start = null;
 
       const step = (timestamp) => {
@@ -156,19 +164,21 @@ function CustomerMenu() {
         const progress = timestamp - start;
         const percent = Math.min(progress / duration, 1);
         
-        // easeInOutCubic for a smooth acceleration and deceleration
+        // easeInOutQuart for an even smoother start and end
         const ease = percent < 0.5 
-          ? 4 * percent * percent * percent 
-          : 1 - Math.pow(-2 * percent + 2, 3) / 2;
+          ? 8 * percent * percent * percent * percent 
+          : 1 - Math.pow(-2 * percent + 2, 4) / 2;
           
         window.scrollTo(0, startY + distance * ease);
         
         if (progress < duration) {
-          window.requestAnimationFrame(step);
+          window.currentScrollAnim = window.requestAnimationFrame(step);
+        } else {
+          window.currentScrollAnim = null;
         }
       };
       
-      window.requestAnimationFrame(step);
+      window.currentScrollAnim = window.requestAnimationFrame(step);
     }
   };
 
